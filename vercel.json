@@ -1,7 +1,7 @@
 {
     "builds": [
         {
-            "src": "abd_api/wsgi.py",
+            "src": "Whatsapp_API/wsgi.py",
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "15mb",
@@ -12,7 +12,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "abd_api/wsgi.py"
+            "dest": "Whatsapp_API/wsgi.py"
         }
     ]
 }

@@ -2,12 +2,9 @@ from django.utils import timezone
 import requests, re, os, json
 from pathlib import Path
 import importlib.util
-
-# from api.models import Settings
 from dotenv import load_dotenv, find_dotenv, set_key
 
-ENV_PATH = find_dotenv()
-load_dotenv(ENV_PATH)
+load_dotenv(ENV_PATH := find_dotenv())
 
 # ssh -R whatsapp-api:80:127.0.0.1:8000 serveo.net
 # https://whatsapp-api.serveo.net
