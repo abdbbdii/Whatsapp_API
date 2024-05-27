@@ -16,18 +16,18 @@ testing = False
 
 class Settings:
     def __init__(self):
-        self.admin_ids = os.getenv("SETTING_ADMIN_IDS").split(",")
-        self.whatsapp_client_url = os.getenv("SETTING_WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("SETTING_WHATSAPP_CLIENT_URL")
-        self.public_url = os.getenv("SETTING_PUBLIC_URL_TEST") if testing else os.getenv("SETTING_PUBLIC_URL")
-        self.blacklist_ids = os.getenv("SETTING_BLACKLIST_IDS").split(",")
-        self.admin_command_prefix = os.getenv("SETTING_ADMIN_COMMAND_PREFIX")
-        self.classroom_group_id = os.getenv("SETTING_CLASSROOM_GROUP_ID")
-        self.reminders_api_classroom_id = os.getenv("SETTING_REMINDERS_API_CLASSROOM_ID")
-        self.reminders_key = os.getenv("SECRET_REMINDERS_KEY")
+        self.admin_ids = os.getenv("ADMIN_IDS").split(",")
+        self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
+        self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
+        self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
+        self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
+        self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID")
+        self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
+        self.reminders_key = os.getenv("REMINDERS_KEY")
 
     def update(self, key, value):
         setattr(self, key, value)
-        set_key(ENV_PATH, str(key), str(value))
+        set_key(ENV_PATH, str(key).upper(), str(value))
 
     def __str__(self) -> str:
         return f"""
