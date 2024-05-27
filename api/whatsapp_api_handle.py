@@ -4,6 +4,7 @@ from pathlib import Path
 import importlib.util
 from api.utils.reminders_api import ReminderAPI
 from dotenv import load_dotenv, find_dotenv
+from api.models import Settings
 
 load_dotenv(find_dotenv())
 
@@ -15,51 +16,45 @@ testing = True
 
 PLUGIN_DIR = Path("api/plugins")
 
-if os.path.exists("settings.json"):
-    appSettings = json.load(open("settings.json", "r"))
-else:
-    appSettings = {
-        "adminIds": ["923124996133", "923201002771"],
-        "whatsapp_http_client": "https://abd-container-api-whatsappp.gentleglacier-65c375c0.australiaeast.azurecontainerapps.io/",
-        "whatsapp_http_client_testing": "http://localhost:3000/",
-        "public_url": "https://whatsapp-api.serveo.net",
-        "blacklist": [],
-        "admin_command_prefix": "abd",
-        "classroomGroupId": "120363285077723579@g.us",
-        "reminders_api_classroom_id": ReminderAPI(os.getenv("REMINDERS_API_KEY")).find_application_id("classroom"),
-    }
-    json.dump(appSettings, open("settings.json", "w"))
+settings_instance = Settings.objects.first()
 
+if not settings_instance:
+    settings_instance = Settings()
+    settings_instance.settings_json = json.dumps(
+        {
+            "adminIds": ["923124996133", "923201002771"],
+            "whatsapp_http_client": "https://abd-container-api-whatsappp.gentleglacier-65c375c0.australiaeast.azurecontainerapps.io/",
+            "whatsapp_http_client_testing": "http://localhost:3000/",
+            "public_url": "https://whatsapp-api.serveo.net",
+            "blacklist": [],
+            "admin_command_prefix": "abd",
+            "classroomGroupId": "120363285077723579@g.us",
+            "reminders_api_classroom_id": ReminderAPI(os.getenv("REMINDERS_API_KEY")).find_application_id("classroom"),
+        }
+    )
+    settings_instance.save()
+
+appSettings = json.loads(Settings.objects.first().settings_json)
 whatsapp_http = appSettings.get("whatsapp_http_client_testing" if testing else "whatsapp_http_client")
 
 
 class SenderInBlackList(Exception):
-    """Exception raised when sender is in blacklist."""
-
     pass
 
 
 class SenderNotAdmin(Exception):
-    """Exception raised when sender is not an admin."""
-
     pass
 
 
 class EmptyMessageInGroup(Exception):
-    """Exception raised when message is empty in group."""
-
     pass
 
 
 class EmptyCommand(Exception):
-    """Exception raised when command is empty."""
-
     pass
 
 
 class CommandNotFound(Exception):
-    """Exception raised when command is not found."""
-
     pass
 
 
@@ -201,12 +196,12 @@ class API:
             self.message.outgoing_text_message = e
 
         # except Exception as e:
-            # self.message.outgoing_text_message = f"*Error:*\n```{e}```\n\nThis error has been reported to admins, please try again later in the next update."
-            # self.message.send_message()
+        # self.message.outgoing_text_message = f"*Error:*\n```{e}```\n\nThis error has been reported to admins, please try again later in the next update."
+        # self.message.send_message()
 
-            # self.message.send_to = appSettings.get("adminIds")
-            # self.message.outgoing_text_message = f"An error occurred while trying to process message from: {self.message.sender} in {self.message.group}.\nSender Name: ({data.get('pushname')})\n\n> {self.message.incoming_text_message.replace('\n', '\n> ')}\n\n```{e}```"
-            # self.message.send_message()
+        # self.message.send_to = appSettings.get("adminIds")
+        # self.message.outgoing_text_message = f"An error occurred while trying to process message from: {self.message.sender} in {self.message.group}.\nSender Name: ({data.get('pushname')})\n\n> {self.message.incoming_text_message.replace('\n', '\n> ')}\n\n```{e}```"
+        # self.message.send_message()
 
     def message_handle(self):
         raise NotImplementedError("Message handling is not implemented.")  # TODO

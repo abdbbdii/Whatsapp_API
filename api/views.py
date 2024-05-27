@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from .whatsapp_api_handle import API, appSettings
-import json, os
+import json
 
 
 # Path: /api/whatsapp

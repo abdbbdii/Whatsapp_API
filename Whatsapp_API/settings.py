@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
+import dj_database_url
 import os
 
 load_dotenv(find_dotenv())
@@ -79,10 +80,13 @@ WSGI_APPLICATION = "Whatsapp_API.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
+    "default": dj_database_url.parse(
+        "postgres://default:8cDHRVS0FMGv@ep-solitary-math-a4al6q9l.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require"
+    ),
 }
 
 
