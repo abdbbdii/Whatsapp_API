@@ -20,8 +20,8 @@ testing = True
 class Settings:
     def __init__(self):
         self.admin_ids = os.getenv("SETTING_ADMIN_IDS").split(",")
-        self.whatsapp_http_client = os.getenv("SETTING_WHATSAPP_HTTP_CLIENT") if not testing else "http://localhost:3000/"
-        self.public_url = os.getenv("SETTING_PUBLIC_URL") if not testing else "http://localhost:8000/"
+        self.whatsapp_client_url = os.getenv("SETTING_WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("SETTING_WHATSAPP_CLIENT_URL")
+        self.public_url = os.getenv("SETTING_PUBLIC_URL_TEST") if testing else os.getenv("SETTING_PUBLIC_URL")
         self.blacklist_ids = os.getenv("SETTING_BLACKLIST_IDS").split(",")
         self.admin_command_prefix = os.getenv("SETTING_ADMIN_COMMAND_PREFIX")
         self.classroom_group_id = os.getenv("SETTING_CLASSROOM_GROUP_ID")
@@ -30,7 +30,19 @@ class Settings:
 
     def update(self, key, value):
         setattr(self, key, value)
-        set_key(ENV_PATH, key, value)
+        set_key(ENV_PATH, str(key), str(value))
+
+    def __str__(self) -> str:
+        return f"""
+admin_ids: {self.admin_ids}
+whatsapp_client_url: {self.whatsapp_client_url}
+public_url: {self.public_url}
+blacklist_ids: {self.blacklist_ids}
+admin_command_prefix: {self.admin_command_prefix}
+classroom_group_id: {self.classroom_group_id}
+reminders_api_classroom_id: {self.reminders_api_classroom_id}
+reminders_key: {self.reminders_key}
+"""
 
 
 appSettings = Settings()
@@ -95,8 +107,6 @@ class Message:
 
     def get_incoming_text_message(self, data):
         incoming_text_message = data["message"]["text"].replace("\xa0", " ")
-        print(incoming_text_message)
-
         if incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
@@ -115,7 +125,6 @@ class Message:
             incoming_text_message = incoming_text_message[1:].strip()
             self.arguments = self.get_arguments(incoming_text_message)
 
-            print(appSettings.admin_command_prefix, self.arguments[0])
             if appSettings.admin_command_prefix == self.arguments[0]:
                 if self.sender in appSettings.admin_ids:
                     self.admin_privilege = True
@@ -155,7 +164,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_http_client + "send/message", data=body).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/message", data=body).text)
 
     def send_file(self):
         for phone in self.send_to:
@@ -163,7 +172,7 @@ class Message:
                 "phone": phone,
                 "caption": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_http_client + "send/file", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/file", data=body, files=self.files).text)
 
     def send_audio(self):
         for phone in self.send_to:
@@ -171,7 +180,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_http_client + "send/audio", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/audio", data=body, files=self.files).text)
 
     def send_image(self):
         for phone in self.send_to:
@@ -179,7 +188,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_http_client + "send/image", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/image", data=body, files=self.files).text)
 
 
 class API:
@@ -223,4 +232,3 @@ class API:
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message.append(f"`{plugin.command_name}`: {plugin.description}")
         self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n\n'.join(help_message)}"
-        print(self.message.outgoing_text_message)

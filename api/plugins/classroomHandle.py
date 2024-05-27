@@ -3,7 +3,6 @@ from api.utils.download_gdrive import download_gdrive_file
 from api.utils.reminders_api import ReminderAPI
 from datetime import datetime, timedelta
 import json
-from dotenv import find_dotenv, set_key
 
 pluginInfo = {
     "command_name": "classroom",
@@ -87,7 +86,7 @@ def handle_function(message: Message):
             items={
                 "📝 Title": message.document["content"]["activity"]["title"],
                 "📄 Description": message.document["content"]["activity"].get("description"),
-                "⏰ Due": " ".join(["/".join(list(map(str, message.document["content"]["activity"].get("dueDate", {}).values()))), ":".join(list(map(str, message.document["content"]["activity"].get("dueTime", {}).values())))]),
+                "⏰ Due": " ".join(["/".join(list(map(str, message.document["content"]["activity"].get("dueDate", {}).values()))), ":".join(list(map(str, message.document["content"]["activity"].get("dueTime", {}).values())))]).strip(),
                 "🏆 Points": message.document["content"]["activity"].get("maxPoints"),
                 "🔗 Link": message.document["content"]["activity"]["alternateLink"],
             },
