@@ -1,3 +1,4 @@
 from django.db import models
 
-# Create your models here.
+# class Settings(models.Model):
+#     settings_json = models.JSONField()
