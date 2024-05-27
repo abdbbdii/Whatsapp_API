@@ -13,7 +13,7 @@ load_dotenv(ENV_PATH)
 # https://whatsapp-api.serveo.net
 
 ###############
-testing = True
+testing = False
 ###############
 
 
