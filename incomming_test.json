@@ -1,0 +1,19 @@
+{
+    "audio": null,
+    "contact": null,
+    "document": null,
+    "forwarded": false,
+    "from": "923201002771@s.whatsapp.net",
+    "image": null,
+    "list": null,
+    "live_location": null,
+    "location": null,
+    "message": {"id": "04366686B34826DA3833D4E2243D5971", "text": "/", "replied_id": ""},
+    "order": null,
+    "pushname": "uyu",
+    "quoted_message": null,
+    "reaction": {"id": "", "message": ""},
+    "sticker": null,
+    "video": null,
+    "view_once": null
+}
