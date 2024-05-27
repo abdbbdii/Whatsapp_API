@@ -3,26 +3,22 @@ from .whatsapp_api_handle import API, appSettings
 import json
 
 
-# Path: /api/whatsapp
 def whatsapp(request):
     if request.method == "POST":
-        body = json.loads(request.body.decode("utf-8"))
-        print("WhatsApp API")
-        API(body)
+        print("/api/whatsapp")
+        API(json.loads(request.body.decode("utf-8")))
         print("Message sent successfully.")
         return JsonResponse({"statusCode": 200, "message": "Message sent successfully."})
     else:
         return JsonResponse({"message": "Authorization required."})
 
 
-# Path: /api/classroom
 def classroom(request):
     if request.method == "POST":
-        body = json.loads(request.body.decode("utf-8"))
-        print("Classroom API")
+        print("/api/classroom")
         API(
             {
-                "document": body,
+                "document": json.loads(request.body.decode("utf-8")),
                 "from": f"{appSettings["adminIds"][0]}@s.whatsapp.net in {appSettings['classroomGroupId']}",
                 "message": {"text": "./classroom"},
             }
@@ -33,15 +29,12 @@ def classroom(request):
         return JsonResponse({"message": "Authorization required."})
 
 
-# Path: /api/reminder
 def reminder(request):
     if request.method == "POST":
-        body = json.loads(request.body.decode("utf-8"))
-        print("Reminder API")
-        print(body)
+        print("/api/reminder")
         API(
             {
-                "document": body,
+                "document": json.loads(request.body.decode("utf-8")),
                 "from": f"{appSettings["adminIds"][0]}@s.whatsapp.net in {appSettings['classroomGroupId']}",
                 "message": {"text": "./reminder"},
             }
