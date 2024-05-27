@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .whatsapp_api_handle import API, appSettings
+from api.whatsapp_api_handle import API, appSettings
 import json
 
 
@@ -19,7 +19,7 @@ def classroom(request):
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
-                "from": f"{appSettings["adminIds"][0]}@s.whatsapp.net in {appSettings['classroomGroupId']}",
+                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}",
                 "message": {"text": "./classroom"},
             }
         )
@@ -35,7 +35,7 @@ def reminder(request):
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
-                "from": f"{appSettings["adminIds"][0]}@s.whatsapp.net in {appSettings['classroomGroupId']}",
+                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}",
                 "message": {"text": "./reminder"},
             }
         )

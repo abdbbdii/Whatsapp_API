@@ -2,40 +2,38 @@ from django.utils import timezone
 import requests, re, os, json
 from pathlib import Path
 import importlib.util
-from api.utils.reminders_api import ReminderAPI
-from api.models import Settings
-# from dotenv import load_dotenv, find_dotenv
 
-# load_dotenv(find_dotenv())
+# from api.models import Settings
+from dotenv import load_dotenv, find_dotenv, set_key
+
+ENV_PATH = find_dotenv()
+load_dotenv(ENV_PATH)
 
 # ssh -R whatsapp-api:80:127.0.0.1:8000 serveo.net
+# https://whatsapp-api.serveo.net
 
 ###############
 testing = True
 ###############
 
-PLUGIN_DIR = Path("api/plugins")
 
-settings_instance = Settings.objects.first()
+class Settings:
+    def __init__(self):
+        self.admin_ids = os.getenv("SETTING_ADMIN_IDS").split(",")
+        self.whatsapp_http_client = os.getenv("SETTING_WHATSAPP_HTTP_CLIENT") if not testing else "http://localhost:3000/"
+        self.public_url = os.getenv("SETTING_PUBLIC_URL") if not testing else "http://localhost:8000/"
+        self.blacklist_ids = os.getenv("SETTING_BLACKLIST_IDS").split(",")
+        self.admin_command_prefix = os.getenv("SETTING_ADMIN_COMMAND_PREFIX")
+        self.classroom_group_id = os.getenv("SETTING_CLASSROOM_GROUP_ID")
+        self.reminders_api_classroom_id = os.getenv("SETTING_REMINDERS_API_CLASSROOM_ID")
+        self.reminders_key = os.getenv("SECRET_REMINDERS_KEY")
 
-if not settings_instance:
-    settings_instance = Settings()
-    settings_instance.settings_json = json.dumps(
-        {
-            "adminIds": ["923124996133", "923201002771"],
-            "whatsapp_http_client": "https://abd-container-api-whatsappp.gentleglacier-65c375c0.australiaeast.azurecontainerapps.io/",
-            "whatsapp_http_client_testing": "http://localhost:3000/",
-            "public_url": "https://whatsapp-api.serveo.net",
-            "blacklist": [],
-            "admin_command_prefix": "abd",
-            "classroomGroupId": "120363285077723579@g.us",
-            "reminders_api_classroom_id": ReminderAPI('jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy').find_application_id("classroom"),
-        }
-    )
-    settings_instance.save()
+    def update(self, key, value):
+        setattr(self, key, value)
+        set_key(ENV_PATH, key, value)
 
-appSettings = json.loads(Settings.objects.first().settings_json)
-whatsapp_http = appSettings.get("whatsapp_http_client_testing" if testing else "whatsapp_http_client")
+
+appSettings = Settings()
 
 
 class SenderInBlackList(Exception):
@@ -69,8 +67,8 @@ class Plugin:
     @staticmethod
     def load_plugins():
         plugins = {}
-        for file in [file.rstrip(".py") for file in os.listdir(PLUGIN_DIR) if file.endswith(".py")]:
-            spec = importlib.util.spec_from_file_location(file, PLUGIN_DIR / (file + ".py"))
+        for file in [file.rstrip(".py") for file in os.listdir(Path("api/plugins")) if file.endswith(".py")]:
+            spec = importlib.util.spec_from_file_location(file, Path("api/plugins") / (file + ".py"))
             plugin = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(plugin)
             plugins[plugin.pluginInfo["command_name"]] = Plugin(
@@ -101,9 +99,9 @@ class Message:
 
         if incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
-        elif self.sender not in appSettings["adminIds"] and self.sender in appSettings["blacklist"]:
+        elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
             raise SenderInBlackList("Sender is in blacklist.")
-        elif self.sender not in appSettings.get("adminIds") and testing == True:
+        elif self.sender not in appSettings.admin_ids and testing == True:
             raise SenderNotAdmin("Sender is not an admin.")
 
         if self.group:
@@ -117,8 +115,9 @@ class Message:
             incoming_text_message = incoming_text_message[1:].strip()
             self.arguments = self.get_arguments(incoming_text_message)
 
-            if self.arguments[0] == appSettings["admin_command_prefix"]:
-                if self.sender in appSettings["adminIds"]:
+            print(appSettings.admin_command_prefix, self.arguments[0])
+            if appSettings.admin_command_prefix == self.arguments[0]:
+                if self.sender in appSettings.admin_ids:
                     self.admin_privilege = True
                     self.arguments = self.arguments[1:]
 
@@ -156,7 +155,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(whatsapp_http + "send/message", data=body).text)
+            print(requests.post(appSettings.whatsapp_http_client + "send/message", data=body).text)
 
     def send_file(self):
         for phone in self.send_to:
@@ -164,7 +163,7 @@ class Message:
                 "phone": phone,
                 "caption": self.outgoing_text_message,
             }
-            print(requests.post(whatsapp_http + "send/file", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_http_client + "send/file", data=body, files=self.files).text)
 
     def send_audio(self):
         for phone in self.send_to:
@@ -172,7 +171,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(whatsapp_http + "send/audio", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_http_client + "send/audio", data=body, files=self.files).text)
 
     def send_image(self):
         for phone in self.send_to:
@@ -180,7 +179,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(whatsapp_http + "send/image", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_http_client + "send/image", data=body, files=self.files).text)
 
 
 class API:

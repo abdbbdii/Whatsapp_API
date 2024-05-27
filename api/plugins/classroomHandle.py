@@ -1,9 +1,9 @@
 from api.whatsapp_api_handle import appSettings, Message
 from api.utils.download_gdrive import download_gdrive_file
 from api.utils.reminders_api import ReminderAPI
-from api.whatsapp_api_handle import os
 from datetime import datetime, timedelta
 import json
+from dotenv import find_dotenv, set_key
 
 pluginInfo = {
     "command_name": "classroom",
@@ -35,11 +35,13 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
     if not time:
         time = {"hours": 23, "minutes": 59}
 
-    reminders_api = ReminderAPI(os.getenv("REMINDERS_API_KEY"), appSettings["public_url"] + "/api/reminder", ("admin", "admin"))
-    application_id = appSettings.get("reminders_api_classroom_id", reminders_api.find_application_id("classroom"))
+    reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "/api/reminder", ("admin", "admin"))
+    application_id = appSettings.reminders_api_classroom_id if appSettings.reminders_api_classroom_id else reminders_api.find_application_id("classroom")
+    appSettings.update("reminders_api_classroom_id", application_id)
 
     if not application_id:
-        application_id = appSettings["reminders_api_classroom_id"] = reminders_api.create_application("classroom", "10:00").json().get("id")
+        application_id = appSettings.reminders_api_classroom_id = reminders_api.create_application("classroom", "10:00").json().get("id")
+        appSettings.update("reminders_api_classroom_id", application_id)
 
     reminders = [60, 30, 10, 0]
     for reminder in reminders:

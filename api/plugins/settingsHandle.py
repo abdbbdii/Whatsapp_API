@@ -11,19 +11,20 @@ pluginInfo = {
 
 
 def handle_function(message: Message):
-    settingArgs = parser(" ".join(message.arguments), list(appSettings.keys()))
+    settingArgs = parser(" ".join(message.arguments), [attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])
     if isinstance(settingArgs, str):
         message.outgoing_text_message = settingArgs
     elif settingArgs.change:
-        oldSettings = appSettings[settingArgs.change[0]]
-        appSettings[settingArgs.change[0]] = settingArgs.change[1]
+        oldSettings = getattr(appSettings, settingArgs.change[0])
+        getattr(appSettings, settingArgs.change[0])
+        setattr(appSettings, settingArgs.change[0], settingArgs.change[1])
         # setAppSettings(settings=appSettings)
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed from\n```{oldSettings}```\nto\n```{settingArgs.change[1]}```"
     elif settingArgs.get:
         if settingArgs.get == "all":
             message.outgoing_text_message = f"```{appSettings}```"
         else:
-            message.outgoing_text_message = f"Value of setting `{settingArgs.get}` is\n```{appSettings[settingArgs.get]}```"
+            message.outgoing_text_message = f"Value of setting `{settingArgs.get}` is\n```{getattr(appSettings, settingArgs.get)}```"
     else:
         message.outgoing_text_message = "Setting not recognized."
     message.send_message()
