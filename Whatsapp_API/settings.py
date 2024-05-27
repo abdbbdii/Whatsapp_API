@@ -11,11 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv, find_dotenv
 import dj_database_url
-import os
+# import os
+# from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = "django-insecure-#mi%3&(2*pt@@(7^-%b0y=d4ev_2pu2vrrhm6x6^1k*c#jf543"
+# SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -84,9 +85,7 @@ DATABASES = {
     #     "ENGINE": "django.db.backends.sqlite3",
     #     "NAME": BASE_DIR / "db.sqlite3",
     # }
-    "default": dj_database_url.parse(
-        "postgres://default:8cDHRVS0FMGv@ep-solitary-math-a4al6q9l.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require"
-    ),
+    "default": dj_database_url.parse("postgres://default:8cDHRVS0FMGv@ep-solitary-math-a4al6q9l.us-east-1.aws.neon.tech:5432/verceldb?sslmode=require"),
 }
 
 

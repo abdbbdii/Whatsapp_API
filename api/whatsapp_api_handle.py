@@ -3,10 +3,10 @@ import requests, re, os, json
 from pathlib import Path
 import importlib.util
 from api.utils.reminders_api import ReminderAPI
-from dotenv import load_dotenv, find_dotenv
 from api.models import Settings
+# from dotenv import load_dotenv, find_dotenv
 
-load_dotenv(find_dotenv())
+# load_dotenv(find_dotenv())
 
 # ssh -R whatsapp-api:80:127.0.0.1:8000 serveo.net
 
@@ -29,7 +29,7 @@ if not settings_instance:
             "blacklist": [],
             "admin_command_prefix": "abd",
             "classroomGroupId": "120363285077723579@g.us",
-            "reminders_api_classroom_id": ReminderAPI(os.getenv("REMINDERS_API_KEY")).find_application_id("classroom"),
+            "reminders_api_classroom_id": ReminderAPI('jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy').find_application_id("classroom"),
         }
     )
     settings_instance.save()
