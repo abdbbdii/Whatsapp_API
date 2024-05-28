@@ -16,31 +16,34 @@ testing = False
 
 class Settings:
     def __init__(self):
-        try:
-            self.admin_ids = os.getenv("ADMIN_IDS").split(",")
-            self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
-            self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
-            self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
-            self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
-            self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID")
-            self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
-            self.reminders_key = os.getenv("REMINDERS_KEY")
-        except Exception as e:
-            if not [os.getenv("ADMIN_IDS"), os.getenv("WHATSAPP_CLIENT_URL"), os.getenv("PUBLIC_URL"), os.getenv("BLACKLIST_IDS"), os.getenv("ADMIN_COMMAND_PREFIX"), os.getenv("CLASSROOM_GROUP_ID"), os.getenv("REMINDERS_API_CLASSROOM_ID"), os.getenv("REMINDERS_KEY")].count(None):
-                print("Error: One or more environment variables are missing.")
-                print(f"Error: {e}")
-                self.admin_ids = ['923124996133', '923201002771']
-                self.whatsapp_client_url = ''
-                self.public_url = 'https://whatsapp-api-backend.vercel.app/'
-                self.blacklist_ids = ['']
-                self.admin_command_prefix = 'abd'
-                self.classroom_group_id = '120363285077723579@g.us'
-                self.reminders_api_classroom_id = '860'
-                self.reminders_key = 'jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy'
+        self.admin_ids = os.getenv("ADMIN_IDS").split(",")
+        self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
+        self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
+        self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
+        self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
+        self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID_TEST") if testing else os.getenv("CLASSROOM_GROUP_ID")
+        self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
+        self.reminders_key = os.getenv("REMINDERS_KEY")
 
     def update(self, key, value):
         setattr(self, key, value)
         set_key(ENV_PATH, str(key).upper(), str(value))
+
+    def add_admin(self, admin_id):
+        self.admin_ids.append(admin_id)
+        set_key(ENV_PATH, "ADMIN_IDS", ",".join(self.admin_ids))
+
+    def remove_admin(self, admin_id):
+        self.admin_ids.remove(admin_id)
+        set_key(ENV_PATH, "ADMIN_IDS", ",".join(self.admin_ids))
+
+    def add_blacklist(self, blacklist_id):
+        self.blacklist_ids.append(blacklist_id)
+        set_key(ENV_PATH, "BLACKLIST_IDS", ",".join(self.blacklist_ids))
+
+    def remove_blacklist(self, blacklist_id):
+        self.blacklist_ids.remove(blacklist_id)
+        set_key(ENV_PATH, "BLACKLIST_IDS", ",".join(self.blacklist_ids))
 
     def __str__(self) -> str:
         return f"""
@@ -56,7 +59,6 @@ reminders_key: {self.reminders_key}
 
 
 appSettings = Settings()
-print(appSettings)
 
 
 class SenderInBlackList(Exception):
