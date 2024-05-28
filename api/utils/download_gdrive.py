@@ -9,7 +9,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
-load_dotenv(find_dotenv())
+load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
@@ -29,7 +29,11 @@ def authenticate():
             flow = InstalledAppFlow.from_client_config(json.loads(os.getenv("GOOGLE_CREDENTIALS")), SCOPES)
             creds = flow.run_local_server(port=0)
 
-        set_key(find_dotenv(), "TOKEN_PICKLE_BASE64", base64.b64encode(pickle.dumps(creds)).decode("utf-8"))
+        if os.getenv("VERCEL_ENV"):
+            os.environ["TOKEN_PICKLE_BASE64"] = base64.b64encode(pickle.dumps(creds)).decode("utf-8")
+        else:
+            set_key(find_dotenv(), "TOKEN_PICKLE_BASE64", base64.b64encode(pickle.dumps(creds)).decode("utf-8"))
+
     print("Authenticated successfully!")
     return creds
 

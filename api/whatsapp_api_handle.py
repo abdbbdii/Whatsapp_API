@@ -4,7 +4,7 @@ from pathlib import Path
 import importlib.util
 from dotenv import load_dotenv, find_dotenv, set_key
 
-load_dotenv(ENV_PATH := find_dotenv())
+load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
 
 # ssh -R whatsapp-api:80:127.0.0.1:8000 serveo.net
 # https://whatsapp-api.serveo.net
@@ -27,23 +27,13 @@ class Settings:
 
     def update(self, key, value):
         setattr(self, key, value)
-        set_key(ENV_PATH, str(key).upper(), str(value))
 
-    def add_admin(self, admin_id):
-        self.admin_ids.append(admin_id)
-        set_key(ENV_PATH, "ADMIN_IDS", ",".join(self.admin_ids))
+        if os.getenv("VERCEL_ENV"):
+            os.environ[str(key).upper()] = str(value)
+        else:
+            set_key(find_dotenv(), str(key).upper(), str(value))
 
-    def remove_admin(self, admin_id):
-        self.admin_ids.remove(admin_id)
-        set_key(ENV_PATH, "ADMIN_IDS", ",".join(self.admin_ids))
 
-    def add_blacklist(self, blacklist_id):
-        self.blacklist_ids.append(blacklist_id)
-        set_key(ENV_PATH, "BLACKLIST_IDS", ",".join(self.blacklist_ids))
-
-    def remove_blacklist(self, blacklist_id):
-        self.blacklist_ids.remove(blacklist_id)
-        set_key(ENV_PATH, "BLACKLIST_IDS", ",".join(self.blacklist_ids))
 
     def __str__(self) -> str:
         return f"""
