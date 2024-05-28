@@ -16,14 +16,25 @@ testing = False
 
 class Settings:
     def __init__(self):
-        self.admin_ids = os.getenv("ADMIN_IDS").split(",")
-        self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
-        self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
-        self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
-        self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
-        self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID")
-        self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
-        self.reminders_key = os.getenv("REMINDERS_KEY")
+        try:
+            self.admin_ids = os.getenv("ADMIN_IDS").split(",")
+            self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
+            self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
+            self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
+            self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
+            self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID")
+            self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
+            self.reminders_key = os.getenv("REMINDERS_KEY")
+        except Exception as e:
+            print(f"Error: {e}")
+            self.admin_ids = ['923124996133', '923201002771']
+            self.whatsapp_client_url = ''
+            self.public_url = 'https://whatsapp-api-backend.vercel.app/'
+            self.blacklist_ids = ['']
+            self.admin_command_prefix = 'abd'
+            self.classroom_group_id = '120363285077723579@g.us'
+            self.reminders_api_classroom_id = '860'
+            self.reminders_key = 'jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy'
 
     def update(self, key, value):
         setattr(self, key, value)
@@ -43,6 +54,7 @@ reminders_key: {self.reminders_key}
 
 
 appSettings = Settings()
+print(appSettings)
 
 
 class SenderInBlackList(Exception):
