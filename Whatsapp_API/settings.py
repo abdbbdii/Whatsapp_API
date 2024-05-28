@@ -12,9 +12,11 @@ SECRET_KEY = os.getenv("DJANGO_KEY")
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    "*.vercel.app",
+    "whatsapp-api-backend.vercel.app",
+    "whatsapp-api-backend-git-main-abdbbdiis-projects.vercel.app",
+    "whatsapp-api-backend-hhjlbus6l-abdbbdiis-projects.vercel.app",
     "127.0.0.1",
-    "*.serveo.net",
+    "serveo.net",
     "localhost",
 ]
 
