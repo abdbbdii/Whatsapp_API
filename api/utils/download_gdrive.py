@@ -1,32 +1,36 @@
 import os
 import pickle
 import io
+import base64
+import json
+from dotenv import find_dotenv, set_key, load_dotenv
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
-# If modifying these SCOPES, delete the file gdrive-token.pickle.
+load_dotenv(find_dotenv())
+
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 def authenticate():
-    """Shows basic usage of the Drive v3 API."""
+    """
+    Authenticates the user using OAuth2 credentials and returns the credentials object.
+    """
     creds = None
-    # The file gdrive-token.pickle stores the user's access and refresh tokens, and is created automatically when the authorization flow completes for the first time.
-    if os.path.exists("gdrive-token.pickle"):
-        with open("gdrive-token.pickle", "rb") as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
+
+    if token := os.getenv("TOKEN_PICKLE_BASE64"):
+        creds = pickle.loads(base64.b64decode(token))
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_config(json.loads(os.getenv("GOOGLE_CREDENTIALS")), SCOPES)
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open("gdrive-token.pickle", "wb") as token:
-            pickle.dump(creds, token)
 
+        set_key(find_dotenv(), "TOKEN_PICKLE_BASE64", base64.b64encode(pickle.dumps(creds)).decode("utf-8"))
+    print("Authenticated successfully!")
     return creds
 
 def get_file_data(service, file_id):
