@@ -40,9 +40,9 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
     if appSettings.reminders_api_classroom_id and reminders_api.get_application(appSettings.reminders_api_classroom_id).json().get("message") != "Item not found.":
         application_id = appSettings.reminders_api_classroom_id
     else:
-        application_id = reminders_api.find_application_id("classroom")
+        application_id = reminders_api.find_application_id(appSettings.reminders_api_classroom_name)
         if not application_id:
-            application_id = reminders_api.create_application("classroom", "10:00").json().get("id")
+            application_id = reminders_api.create_application(appSettings.reminders_api_classroom_name, "10:00").json().get("id")
 
         appSettings.update("reminders_api_classroom_id", application_id)
 

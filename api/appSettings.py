@@ -31,7 +31,8 @@ class AppSettings:
         self.blacklist_ids = settings.blacklist_ids.split(",")
         self.admin_command_prefix = settings.admin_command_prefix
         self.classroom_group_id = settings.classroom_group_id_test if django_settings.DEBUG else settings.classroom_group_id
-        self.reminders_api_classroom_id = settings.reminders_api_classroom_id
+        self.reminders_api_classroom_id = settings.reminders_api_classroom_id_test if django_settings.DEBUG else settings.reminders_api_classroom_id
+        self.reminders_api_classroom_name = settings.reminders_api_classroom_name_test if django_settings.DEBUG else settings.reminders_api_classroom_name
         self.reminders_key = settings.reminders_key
         self.token_pickle_base64 = settings.token_pickle_base64
         self.google_credentials = settings.google_credentials
@@ -44,6 +45,7 @@ blacklist_ids: {self.blacklist_ids}
 admin_command_prefix: {self.admin_command_prefix}
 classroom_group_id: {self.classroom_group_id}
 reminders_api_classroom_id: {self.reminders_api_classroom_id}
+reminders_api_classroom_name: {self.reminders_api_classroom_name}
 reminders_key: {self.reminders_key}
 token_pickle_base64: {self.token_pickle_base64}
 google_credentials: {self.google_credentials}"""
@@ -54,6 +56,10 @@ google_credentials: {self.google_credentials}"""
 
         if isinstance(getattr(settings, key), list):
             value = ",".join(value)
+
+        if key in ["whatsapp_client_url", "public_url", "classroom_group_id", "reminders_api_classroom_id", "reminders_api_classroom_name"]:
+            if django_settings.DEBUG:
+                key += "_test"
 
         setattr(settings, key, value)
         settings.save()
