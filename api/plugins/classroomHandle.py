@@ -86,12 +86,17 @@ def handle_function(message: Message):
         if message.document["content"]["activity"].get("dueTime"):
             message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"] = add_minutes(message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"], 5 * 60)
 
+        if time := message.document["content"]["activity"].get("dueTime"):
+            time = f'{(time["hours"] - 12) if time["hours"] > 12 else time["hours"]}:{time["minutes"]:02d} {"PM" if time["hours"] > 12 else "AM"}'
+        else:
+            time = ""
+
         message.outgoing_text_message = make_message(
             header=f'New {message.document["content"]["activity"]["workType"].title()} created for {message.document["content"]["course"]["descriptionHeading"]}',
             items={
                 "📝 Title": message.document["content"]["activity"]["title"],
                 "📄 Description": message.document["content"]["activity"].get("description"),
-                "⏰ Due": " ".join(["/".join(list(map(str, message.document["content"]["activity"].get("dueDate", {}).values()))), ":".join(list(map(str, message.document["content"]["activity"].get("dueTime", {}).values())))]).strip(),
+                "⏰ Due": f'{"/".join(list(map(str, message.document["content"]["activity"].get("dueDate", {}).values())))} {time}',
                 "🏆 Points": message.document["content"]["activity"].get("maxPoints"),
                 "🔗 Link": message.document["content"]["activity"]["alternateLink"],
             },

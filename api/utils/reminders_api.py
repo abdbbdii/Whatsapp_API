@@ -150,6 +150,5 @@ if __name__ == "__main__":
     # print(reminder_api.create_reminder("876", "Whatsapp_API_Client", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://whatsapp-api-client-1.onrender.com/user/my/privacy").text)  # 16430
     # print(reminder_api.create_reminder("876", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431
 
-    # reminder_api.delete_reminders_for_application("873")
+    # reminder_api.delete_reminders_for_application("876")
     # print(reminder_api.get_reminders_for_application("873").json())
-    # print(reminder_api.get_applications().json())
