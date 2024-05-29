@@ -87,7 +87,7 @@ def handle_function(message: Message):
             message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"] = add_minutes(message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"], 5 * 60)
 
         if time := message.document["content"]["activity"].get("dueTime"):
-            time = f'{(time["hours"] - 12) if time["hours"] > 12 else time["hours"]}:{time["minutes"]:02d} {"PM" if time["hours"] > 12 else "AM"}'
+            time = f'{((time["hours"] - 12) if time["hours"] > 12 else time["hours"]):02d}:{time["minutes"]:02d} {"PM" if time["hours"] > 12 else "AM"}'
         else:
             time = ""
 
