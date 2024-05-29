@@ -1,12 +1,7 @@
 from django.http import JsonResponse
 from api.whatsapp_api_handle import API
 import json
-from .models import Settings
-from Whatsapp_API.settings import DEBUG
-
-appSettings = Settings()
-appSettings.load(DEBUG)
-
+from .appSettings import appSettings
 
 def whatsapp(request):
     if request.method == "POST":

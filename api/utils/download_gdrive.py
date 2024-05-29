@@ -6,7 +6,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
-from ..views import appSettings
+from ..appSettings import appSettings
 
 # load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
 

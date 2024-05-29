@@ -1,9 +1,6 @@
-from typing import Any
 from django.db import models
-from dotenv import load_dotenv, find_dotenv
+from Whatsapp_API.settings import DEBUG
 import os
-
-load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
 
 class Settings(models.Model):
@@ -41,20 +38,19 @@ google_credentials: {self.google_credentials}
         setattr(self, key, value)
         self.save()
 
-    def load(self, debug=False):
-        if not self.objects.first():
-            self.set_default(debug=debug)
-        return self.objects.first()
-
-    def set_default(self, debug=False):
-        self.admin_ids = os.getenv("ADMIN_IDS").split(",")
-        self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if debug else os.getenv("WHATSAPP_CLIENT_URL")
-        self.public_url = os.getenv("PUBLIC_URL_TEST") if debug else os.getenv("PUBLIC_URL")
-        self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
-        self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
-        self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID_TEST") if debug else os.getenv("CLASSROOM_GROUP_ID")
-        self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
-        self.reminders_key = os.getenv("REMINDERS_KEY")
-        self.token_pickle_base64 = os.getenv("TOKEN_PICKLE_BASE64")
-        self.google_credentials = os.getenv("GOOGLE_CREDENTIALS")
-        self.save()
+    @staticmethod
+    def load():
+        if not Settings.objects.first():
+            settings = Settings()
+            settings.admin_ids = os.getenv("ADMIN_IDS").split(",")
+            settings.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if DEBUG else os.getenv("WHATSAPP_CLIENT_URL")
+            settings.public_url = os.getenv("PUBLIC_URL_TEST") if DEBUG else os.getenv("PUBLIC_URL")
+            settings.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
+            settings.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
+            settings.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID_TEST") if DEBUG else os.getenv("CLASSROOM_GROUP_ID")
+            settings.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
+            settings.reminders_key = os.getenv("REMINDERS_KEY")
+            settings.token_pickle_base64 = os.getenv("TOKEN_PICKLE_BASE64")
+            settings.google_credentials = os.getenv("GOOGLE_CREDENTIALS")
+            settings.save()
+        return Settings.objects.first()

@@ -2,8 +2,8 @@ from django.utils import timezone
 import requests, re, os, json
 from pathlib import Path
 import importlib.util
-from dotenv import load_dotenv, find_dotenv, set_key
-from .views import appSettings
+from .appSettings import appSettings
+from Whatsapp_API.settings import DEBUG
 
 # load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
@@ -74,7 +74,7 @@ class Message:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
             raise SenderInBlackList("Sender is in blacklist.")
-        elif self.sender not in appSettings.admin_ids and testing == True:
+        elif self.sender not in appSettings.admin_ids and DEBUG:
             raise SenderNotAdmin("Sender is not an admin.")
 
         if self.group:

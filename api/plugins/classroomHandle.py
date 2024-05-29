@@ -1,7 +1,8 @@
-from api.whatsapp_api_handle import appSettings, Message
+from api.whatsapp_api_handle import Message
 from api.utils.download_gdrive import download_gdrive_file
 from api.utils.reminders_api import ReminderAPI
 from datetime import datetime, timedelta
+from ..appSettings import appSettings
 import json
 
 pluginInfo = {
