@@ -3,52 +3,12 @@ import requests, re, os, json
 from pathlib import Path
 import importlib.util
 from dotenv import load_dotenv, find_dotenv, set_key
+from .views import appSettings
 
-load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
+# load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
 # ssh -R whatsapp-api:80:127.0.0.1:8000 serveo.net
 # https://whatsapp-api.serveo.net
-
-###############
-testing = False
-###############
-
-
-class Settings:
-    def __init__(self):
-        self.admin_ids = os.getenv("ADMIN_IDS").split(",")
-        self.whatsapp_client_url = os.getenv("WHATSAPP_CLIENT_URL_TEST") if testing else os.getenv("WHATSAPP_CLIENT_URL")
-        self.public_url = os.getenv("PUBLIC_URL_TEST") if testing else os.getenv("PUBLIC_URL")
-        self.blacklist_ids = os.getenv("BLACKLIST_IDS").split(",")
-        self.admin_command_prefix = os.getenv("ADMIN_COMMAND_PREFIX")
-        self.classroom_group_id = os.getenv("CLASSROOM_GROUP_ID_TEST") if testing else os.getenv("CLASSROOM_GROUP_ID")
-        self.reminders_api_classroom_id = os.getenv("REMINDERS_API_CLASSROOM_ID")
-        self.reminders_key = os.getenv("REMINDERS_KEY")
-
-    def update(self, key, value):
-        setattr(self, key, value)
-
-        if os.getenv("VERCEL_ENV"):
-            os.environ[str(key).upper()] = str(value)
-        else:
-            set_key(find_dotenv(), str(key).upper(), str(value))
-
-
-
-    def __str__(self) -> str:
-        return f"""
-admin_ids: {self.admin_ids}
-whatsapp_client_url: {self.whatsapp_client_url}
-public_url: {self.public_url}
-blacklist_ids: {self.blacklist_ids}
-admin_command_prefix: {self.admin_command_prefix}
-classroom_group_id: {self.classroom_group_id}
-reminders_api_classroom_id: {self.reminders_api_classroom_id}
-reminders_key: {self.reminders_key}
-"""
-
-
-appSettings = Settings()
 
 
 class SenderInBlackList(Exception):

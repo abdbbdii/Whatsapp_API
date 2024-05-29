@@ -1,15 +1,14 @@
-import os
 import pickle
 import io
 import base64
 import json
-from dotenv import find_dotenv, set_key, load_dotenv
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from ..views import appSettings
 
-load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
+# load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
 
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
@@ -19,20 +18,17 @@ def authenticate():
     """
     creds = None
 
-    if token := os.getenv("TOKEN_PICKLE_BASE64"):
+    if token := appSettings.token_pickle_base64:
         creds = pickle.loads(base64.b64decode(token))
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_config(json.loads(os.getenv("GOOGLE_CREDENTIALS")), SCOPES)
+            flow = InstalledAppFlow.from_client_config(json.loads(appSettings.google_credentials), SCOPES)
             creds = flow.run_local_server(port=0)
 
-        if os.getenv("VERCEL_ENV"):
-            os.environ["TOKEN_PICKLE_BASE64"] = base64.b64encode(pickle.dumps(creds)).decode("utf-8")
-        else:
-            set_key(find_dotenv(), "TOKEN_PICKLE_BASE64", base64.b64encode(pickle.dumps(creds)).decode("utf-8"))
+        appSettings.update("token_pickle_base64", base64.b64encode(pickle.dumps(creds)).decode("utf-8"))
 
     print("Authenticated successfully!")
     return creds

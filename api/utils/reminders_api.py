@@ -1,5 +1,6 @@
 import requests
 
+
 class ReminderAPI:
     def __init__(self, key: str, webhook_url: str = None, http_basic_auth: tuple | list = None) -> None:
         self.key = key
@@ -34,6 +35,11 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
+    def delete_reminders_for_application(self, application_id: str):
+        reminders = self.get_reminders_for_application(application_id).json()["data"]
+        for reminder in reminders:
+            self.delete_reminder(reminder["id"])
+
     def create_application(self, name: str, default_reminder_time_tz: str):
         return requests.post(
             f"{self.endpoint}/applications/",
@@ -66,6 +72,11 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
+    def delete_all_applications(self):
+        applications = self.get_applications().json()["data"]
+        for application in applications:
+            self.delete_application(application["id"])
+
     def get_reminders(self):
         return requests.get(
             f"{self.endpoint}/reminders",
@@ -78,7 +89,7 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
-    def create_reminder(self, application_id: str, title: str, timezone: str, date_tz: str, time_tz: str, rrule: str = None, notes: str = None):
+    def create_reminder(self, application_id: str, title: str, timezone: str, date_tz: str, time_tz: str, rrule: str = None, notes: str = None, webhook_url: str = None):
         return requests.post(
             f"{self.endpoint}/applications/{application_id}/reminders/",
             headers=self.__headers,
@@ -89,7 +100,7 @@ class ReminderAPI:
                 "time_tz": time_tz,
                 "rrule": rrule,
                 "notes": notes,
-                "webhook_url": self.webhook_url,
+                "webhook_url": self.webhook_url if webhook_url is None else webhook_url,
                 "http_basic_auth_username": self.http_basic_auth[0],
                 "http_basic_auth_password": self.http_basic_auth[1],
             },
@@ -117,6 +128,11 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
+    def delete_all_reminders(self):
+        reminders = self.get_reminders().json()["data"]
+        for reminder in reminders:
+            self.delete_reminder(reminder["id"])
+
     def find_application_id(self, application_name: str):
         applications = self.get_applications().json()["data"]
         for application in applications:
@@ -125,15 +141,11 @@ class ReminderAPI:
         return None
 
 
-# get_user()
+if __name__ == "__main__":
+    reminder_api = ReminderAPI("jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy", "https://whatsapp-api-backend.vercel.app/", ("your_username", "your_password"))
+    # print(reminder_api.create_application("classroom", "10:00").text)  # 873
 
-# create_application("My Application", "10:00", "https://whatsapp-api.serveo.net/api/reminder", "your_username", "your_password")
-# get_applications()
-# get_application()
-# get_reminders_for_application("859")
-# delete_application("858")
-
-# create_reminder("859", "Weekly Team Meeting", "Europe/London", "2024-06-01", "10:00", "FREQ=WEEKLY;BYDAY=MO", "https://whatsapp-api.serveo.net/api/reminder", "your_username", "your_password")
-# get_reminders()
-# get_reminder()
-# delete_reminder("16367")
+    # print(reminder_api.create_application("Whatsapp_API_cronjob", "10:00").text)  # 874
+    # print(reminder_api.create_reminder("874", "Whatsapp_API_Backend", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=5", webhook_url="https://whatsapp-api-backend.vercel.app/").text)  # 16429
+    # print(reminder_api.create_reminder("874", "Whatsapp_API_Client", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://whatsapp-api-client-1.onrender.com/user/my/privacy").text)  # 16430
+    # print(reminder_api.create_reminder("874", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431

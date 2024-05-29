@@ -1,6 +1,11 @@
 from django.http import JsonResponse
-from api.whatsapp_api_handle import API, appSettings
+from api.whatsapp_api_handle import API
 import json
+from .models import Settings
+from Whatsapp_API.settings import DEBUG
+
+appSettings = Settings()
+appSettings.load(DEBUG)
 
 
 def whatsapp(request):
@@ -35,7 +40,7 @@ def reminder(request):
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
-                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}",
+                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
                 "message": {"text": "./reminder"},
             }
         )
