@@ -15,14 +15,3 @@ class Settings(models.Model):
     reminders_key = models.TextField(default="", null=True)
     token_pickle_base64 = models.TextField(default="", null=True)
     google_credentials = models.TextField(default="", null=True)
-
-# class User(models.Model):
-#     user_id = models.TextField(default="", null=True)
-#     user_name = models.TextField(default="", null=True)
-#     user_email = models.TextField(default="", null=True)
-#     user_password = models.TextField(default="", null=True)
-#     user_phone = models.TextField(default="", null=True)
-#     user_role = models.TextField(default="", null=True)
-#     user_status = models.TextField(default="", null=True)
-#     user_created_at = models.DateTimeField(auto_now_add=True)
-#     user_updated_at = models.DateTimeField(auto_now=True)

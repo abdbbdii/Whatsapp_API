@@ -146,9 +146,9 @@ if __name__ == "__main__":
     # print(reminder_api.create_application("classroom", "10:00").text)  # 873
 
     # print(reminder_api.create_application("Whatsapp_API_cronjob", "10:00").text)  # 874
-    # print(reminder_api.create_reminder("874", "Whatsapp_API_Backend", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=5", webhook_url="https://whatsapp-api-backend.vercel.app/").text)  # 16429
-    # print(reminder_api.create_reminder("874", "Whatsapp_API_Client", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://whatsapp-api-client-1.onrender.com/user/my/privacy").text)  # 16430
-    # print(reminder_api.create_reminder("874", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431
+    # print(reminder_api.create_reminder("876", "Whatsapp_API_Backend", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=5", webhook_url="https://whatsapp-api-backend.vercel.app/").text)  # 16429
+    # print(reminder_api.create_reminder("876", "Whatsapp_API_Client", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://whatsapp-api-client-1.onrender.com/user/my/privacy").text)  # 16430
+    # print(reminder_api.create_reminder("876", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431
 
     # reminder_api.delete_reminders_for_application("873")
     # print(reminder_api.get_reminders_for_application("873").json())
