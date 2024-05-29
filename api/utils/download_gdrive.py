@@ -6,7 +6,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
-from ..appSettings import appSettings
+from api.appSettings import appSettings
 
 # load_dotenv(find_dotenv()) if not os.getenv('VERCEL_ENV') else None
 
@@ -66,4 +66,3 @@ if __name__ == "__main__":
     data = download_gdrive_file(link)
     with open("downloaded_file.md", "wb") as f:
         f.write(data)
-    print("File downloaded and saved as 'downloaded_file'.")

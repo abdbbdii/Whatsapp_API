@@ -1,5 +1,5 @@
 from api.whatsapp_api_handle import Message
-from ..appSettings import appSettings
+from api.appSettings import appSettings
 from argparse import ArgumentParser
 import shlex
 

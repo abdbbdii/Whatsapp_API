@@ -5,7 +5,7 @@ from .appSettings import appSettings
 
 def whatsapp(request):
     if request.method == "POST":
-        print("/api/whatsapp")
+        print("POST /api/whatsapp")
         API(json.loads(request.body.decode("utf-8")))
         print("Message sent successfully.")
         return JsonResponse({"statusCode": 200, "message": "Message sent successfully."})
@@ -15,7 +15,7 @@ def whatsapp(request):
 
 def classroom(request):
     if request.method == "POST":
-        print("/api/classroom")
+        print("POST /api/classroom")
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
@@ -31,7 +31,7 @@ def classroom(request):
 
 def reminder(request):
     if request.method == "POST":
-        print("/api/reminder")
+        print("POST /api/reminder")
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),

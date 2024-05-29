@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class API_Settings(models.Model):
+class Settings(models.Model):
     admin_ids = models.TextField(default="", null=True)
     whatsapp_client_url = models.TextField(default="", null=True)
     whatsapp_client_url_test = models.TextField(default="", null=True)

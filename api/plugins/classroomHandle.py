@@ -2,7 +2,7 @@ from api.whatsapp_api_handle import Message
 from api.utils.download_gdrive import download_gdrive_file
 from api.utils.reminders_api import ReminderAPI
 from datetime import datetime, timedelta
-from ..appSettings import appSettings
+from api.appSettings import appSettings
 import json
 
 pluginInfo = {
@@ -14,18 +14,18 @@ pluginInfo = {
 
 
 def add_minutes(date, time, minutes):
-    gmt_plus_5_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) + timedelta(minutes=minutes)
+    new_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) + timedelta(minutes=minutes)
     return (
-        {"year": gmt_plus_5_datetime.year, "month": gmt_plus_5_datetime.month, "day": gmt_plus_5_datetime.day},
-        {"hours": gmt_plus_5_datetime.hour, "minutes": gmt_plus_5_datetime.minute},
+        {"year": new_datetime.year, "month": new_datetime.month, "day": new_datetime.day},
+        {"hours": new_datetime.hour, "minutes": new_datetime.minute},
     )
 
 
-def subtract_minutes(date, time, minutes):
-    gmt_plus_5_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) - timedelta(minutes=minutes)
+def subtract_minutes(date: dict[str, int], time: dict[str, int], minutes: int):
+    new_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) - timedelta(minutes=minutes)
     return (
-        {"year": gmt_plus_5_datetime.year, "month": gmt_plus_5_datetime.month, "day": gmt_plus_5_datetime.day},
-        {"hours": gmt_plus_5_datetime.hour, "minutes": gmt_plus_5_datetime.minute},
+        {"year": new_datetime.year, "month": new_datetime.month, "day": new_datetime.day},
+        {"hours": new_datetime.hour, "minutes": new_datetime.minute},
     )
 
 
@@ -35,12 +35,15 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
     if not time:
         time = {"hours": 23, "minutes": 59}
 
-    reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "/api/reminder", ("admin", "admin"))
-    application_id = appSettings.reminders_api_classroom_id if appSettings.reminders_api_classroom_id else reminders_api.find_application_id("classroom")
-    appSettings.update("reminders_api_classroom_id", application_id)
+    reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "api/reminder", ("admin", "admin"))
 
-    if not application_id:
-        application_id = appSettings.reminders_api_classroom_id = reminders_api.create_application("classroom", "10:00").json().get("id")
+    if appSettings.reminders_api_classroom_id and reminders_api.get_application(appSettings.reminders_api_classroom_id).json().get("message") != "Item not found.":
+        application_id = appSettings.reminders_api_classroom_id
+    else:
+        application_id = reminders_api.find_application_id("classroom")
+        if not application_id:
+            application_id = reminders_api.create_application("classroom", "10:00").json().get("id")
+
         appSettings.update("reminders_api_classroom_id", application_id)
 
     reminders = [60, 30, 10, 0]

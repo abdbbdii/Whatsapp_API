@@ -72,8 +72,8 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
-    def delete_all_applications(self):
-        applications = self.get_applications().json()["data"]
+    def delete_applications(self):
+        applications = self.get_applications().json().get("data")
         for application in applications:
             self.delete_application(application["id"])
 
@@ -128,7 +128,7 @@ class ReminderAPI:
             headers=self.__headers,
         )
 
-    def delete_all_reminders(self):
+    def delete_reminders(self):
         reminders = self.get_reminders().json()["data"]
         for reminder in reminders:
             self.delete_reminder(reminder["id"])
@@ -149,3 +149,7 @@ if __name__ == "__main__":
     # print(reminder_api.create_reminder("874", "Whatsapp_API_Backend", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=5", webhook_url="https://whatsapp-api-backend.vercel.app/").text)  # 16429
     # print(reminder_api.create_reminder("874", "Whatsapp_API_Client", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://whatsapp-api-client-1.onrender.com/user/my/privacy").text)  # 16430
     # print(reminder_api.create_reminder("874", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "01:23", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431
+
+    # reminder_api.delete_reminders_for_application("873")
+    # print(reminder_api.get_reminders_for_application("873").json())
+    # print(reminder_api.get_applications().json())

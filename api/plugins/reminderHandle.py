@@ -11,7 +11,6 @@ pluginInfo = {
 
 def handle_function(message: Message):
     for reminder in message.document["reminders_notified"]:
-        print(reminder["notes"])
         notes = json.loads(reminder["notes"])
         match notes["time_remaining"]:
             case 0:
