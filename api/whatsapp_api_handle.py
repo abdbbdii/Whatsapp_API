@@ -1,5 +1,5 @@
 from django.utils import timezone
-import requests, re, os, json
+import requests, re, os
 from pathlib import Path
 import importlib.util
 from .appSettings import appSettings

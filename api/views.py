@@ -19,7 +19,7 @@ def classroom(request):
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
-                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}",
+                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
                 "message": {"text": "./classroom"},
             }
         )
