@@ -57,6 +57,7 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
             time_tz=f'{time_tz["hours"]:02d}:{time_tz["minutes"]:02d}',
             notes=json.dumps({"time_remaining": reminder, "link": link}),
             rrule=None,
+            webhook_url=appSettings.public_url + "api/reminder",
         )
         print(response.text)
 
