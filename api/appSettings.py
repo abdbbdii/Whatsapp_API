@@ -83,7 +83,6 @@ google_credentials: {self.google_credentials}"""
 
         settings.save()
 
-
 # class AppSettings:
 #     def __init__(self) -> None:
 #         self.whatsapp_client_url = ""
