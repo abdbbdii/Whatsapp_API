@@ -103,6 +103,16 @@ def handle_function(message: Message):
             footer="Good Luck ✌️",
         )
 
+    elif message.document["content"]["type"] == "announcement":
+        message.outgoing_text_message = make_message(
+            header=f'New Announcement for {message.document["content"]["course"]["descriptionHeading"]}',
+            items={
+                "💬 Text": message.document["content"]["activity"]["text"],
+                "🔗 Link": message.document["content"]["activity"]["alternateLink"],
+            },
+        )
+        message.document["content"]["activity"]["title"] = "Announcement"
+
     message.send_message()
     set_reminder(message.document["content"]["activity"].get("dueDate"), message.document["content"]["activity"].get("dueTime"), message.document["content"]["activity"]["title"], message.document["content"]["activity"]["alternateLink"])
 
