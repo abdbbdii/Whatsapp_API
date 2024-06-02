@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 pluginInfo = {
     "command_name": "calender",
     "admin_privilege": True,
-    "description": "Calender commands to manage calender. Use ```/abd calender help``` to see available commands",
+    "description": "Calender commands to manage calender. Use `/abd calender help` to see available commands",
     "internal": False,
 }
 

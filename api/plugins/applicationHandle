@@ -1,0 +1,11 @@
+from api.whatsapp_api_handle import Message
+
+pluginInfo = {
+    "command_name": "application",
+    "admin_privilege": False,
+    "description": "Generate an automatic and representable application for taking holidays, leaves, etc. in your university.",
+    "internal": False,
+}
+
+def handle_function(message: Message):
+    ...

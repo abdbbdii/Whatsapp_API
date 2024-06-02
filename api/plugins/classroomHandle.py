@@ -131,7 +131,7 @@ def handle_function(message: Message):
                     "🔗 Link": material["driveFile"]["driveFile"]["alternateLink"],
                 },
             )
-            message.files = {"file": [material["driveFile"]["driveFile"]["title"], download_gdrive_file(material["driveFile"]["driveFile"]["alternateLink"])]}
+            message.media = {"file": [material["driveFile"]["driveFile"]["title"], download_gdrive_file(material["driveFile"]["driveFile"]["alternateLink"])]}
             message.send_file()
 
         elif list(material.keys())[0] == "youtubeVideo":

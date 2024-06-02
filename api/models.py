@@ -18,3 +18,5 @@ class Settings(models.Model):
     reminders_key = models.TextField(default="", null=True)
     token_pickle_base64 = models.TextField(default="", null=True)
     google_credentials = models.TextField(default="", null=True)
+    ocr_space_api_key = models.TextField(default="", null=True)
+    openai_api_key = models.TextField(default="", null=True)

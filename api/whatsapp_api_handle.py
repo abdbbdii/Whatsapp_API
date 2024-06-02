@@ -62,15 +62,22 @@ class Message:
         self.sender, self.group = map(lambda id: re.sub(r"^(\d+).*[:@].*$", r"\1", id) if id else None, [self.senderId, self.groupId])
         self.arguments = None
         self.admin_privilege = False
-        self.incoming_text_message = self.get_incoming_text_message(data)
+        self.incoming_text_message = None
         self.outgoing_text_message = None
         self.send_to = [self.senderId if self.groupId is None else self.groupId]
         self.document = data.get("document")
-        self.files = None
+        self.media_mime_type = None
+        self.media_path = None
+        self.media = None
 
-    def get_incoming_text_message(self, data):
-        incoming_text_message = data["message"]["text"].replace("\xa0", " ")
-        if incoming_text_message == "" and self.group:
+        self.set_media(data)
+        self.set_incoming_text_message(data)
+
+    def set_incoming_text_message(self, data):
+        if not self.media_path:
+            self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
+
+        if self.incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
             raise SenderInBlackList("Sender is in blacklist.")
@@ -78,22 +85,26 @@ class Message:
             raise SenderNotAdmin("Sender is not an admin.")
 
         if self.group:
-            match = re.search(r"\.([^\.].*)", incoming_text_message)
+            match = re.search(r"\.([^\.].*)", self.incoming_text_message)
             if match:
-                incoming_text_message = str(match.group(1))
+                self.incoming_text_message = str(match.group(1))
             else:
                 raise EmptyMessageInGroup("Message is empty in group.")
 
-        if incoming_text_message.startswith("/"):
-            incoming_text_message = incoming_text_message[1:].strip()
-            self.arguments = self.get_arguments(incoming_text_message)
+        if self.incoming_text_message.startswith("/"):
+            self.incoming_text_message = self.incoming_text_message[1:].strip()
+            self.arguments = self.get_arguments(self.incoming_text_message)
 
             if appSettings.admin_command_prefix == self.arguments[0]:
                 if self.sender in appSettings.admin_ids:
                     self.admin_privilege = True
                     self.arguments = self.arguments[1:]
 
-        return incoming_text_message
+    def set_media(self, data):
+        if data["image"]:
+            self.incoming_text_message = data["image"]["caption"].replace("\xa0", " ")
+            self.media_mime_type = data["image"]["mime_type"]
+            self.media_path = data["image"]["media_path"]
 
     def get_arguments(self, command):
         arguments = []
@@ -135,7 +146,7 @@ class Message:
                 "phone": phone,
                 "caption": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_client_url + "send/file", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/file", data=body, files=self.media).text)
 
     def send_audio(self):
         for phone in self.send_to:
@@ -143,7 +154,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_client_url + "send/audio", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/audio", data=body, files=self.media).text)
 
     def send_image(self):
         for phone in self.send_to:
@@ -151,7 +162,7 @@ class Message:
                 "phone": phone,
                 "message": self.outgoing_text_message,
             }
-            print(requests.post(appSettings.whatsapp_client_url + "send/image", data=body, files=self.files).text)
+            print(requests.post(appSettings.whatsapp_client_url + "send/image", data=body, files=self.media).text)
 
 
 class API:

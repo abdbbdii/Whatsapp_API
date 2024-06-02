@@ -2,6 +2,7 @@ import os
 from .models import Settings
 from dotenv import load_dotenv, find_dotenv
 from django.conf import settings as django_settings
+from django.db.utils import ProgrammingError
 
 load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
@@ -36,6 +37,8 @@ class AppSettings:
         self.reminders_key = settings.reminders_key
         self.token_pickle_base64 = settings.token_pickle_base64
         self.google_credentials = settings.google_credentials
+        self.ocr_space_api_key = settings.ocr_space_api_key
+        self.openai_api_key = settings.openai_api_key
 
     def __str__(self) -> str:
         return f"""admin_ids: {self.admin_ids}
@@ -48,7 +51,9 @@ reminders_api_classroom_id: {self.reminders_api_classroom_id}
 reminders_api_classroom_name: {self.reminders_api_classroom_name}
 reminders_key: {self.reminders_key}
 token_pickle_base64: {self.token_pickle_base64}
-google_credentials: {self.google_credentials}"""
+google_credentials: {self.google_credentials}
+ocr_space_api_key: {self.ocr_space_api_key}
+openai_api_key: {self.openai_api_key}"""
 
     def update(self, key, value):
         setattr(self, key, value)
@@ -89,17 +94,24 @@ google_credentials: {self.google_credentials}"""
 
         settings.save()
 
-# class AppSettings:
-#     def __init__(self) -> None:
-#         self.whatsapp_client_url = ""
-#         self.public_url = ""
-#         self.admin_ids = ""
-#         self.blacklist_ids = ""
-#         self.admin_command_prefix = ""
-#         self.classroom_group_id = ""
-#         self.reminders_api_classroom_id = ""
-#         self.reminders_key = ""
-#         self.token_pickle_base64 = ""
-#         self.google_credentials = ""
 
-appSettings = AppSettings()
+try:
+    appSettings = AppSettings()
+except ProgrammingError:
+
+    class AppSettings:
+        def __init__(self) -> None:
+            self.whatsapp_client_url = ""
+            self.public_url = ""
+            self.admin_ids = ""
+            self.blacklist_ids = ""
+            self.admin_command_prefix = ""
+            self.classroom_group_id = ""
+            self.reminders_api_classroom_id = ""
+            self.reminders_key = ""
+            self.token_pickle_base64 = ""
+            self.google_credentials = ""
+            self.ocr_space_api_key = ""
+            self.openai_api_key = ""
+
+    appSettings = AppSettings()
