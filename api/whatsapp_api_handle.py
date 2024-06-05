@@ -191,4 +191,5 @@ class API:
         for _, plugin in self.plugins.items():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message.append(f"- `/{prefix + plugin.command_name}`: {plugin.description}")
-        self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n'.join(help_message.append(f'- `/{prefix}help`: Show this message.'))}"
+        help_message.append(f'- `/{prefix}help`: Show this message.')
+        self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n'.join(help_message)}"
