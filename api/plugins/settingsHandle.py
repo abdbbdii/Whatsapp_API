@@ -12,7 +12,7 @@ pluginInfo = {
 
 def handle_function(message: Message):
     try:
-        settingArgs = parser(message.arguments)
+        settingArgs = parser(message.arguments[1:])
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
@@ -26,7 +26,7 @@ View all settings:
 *Available settings:*
 - {'\n- '.join(appSettings.list())}"""
         message.send_message()
-        message.outgoing_text_message = str(appSettings.list().append("all"))
+        message.outgoing_text_message = str(appSettings.list())
         message.send_message()
         return
     if settingArgs.change:
