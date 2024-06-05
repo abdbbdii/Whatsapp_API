@@ -13,7 +13,7 @@ pluginInfo = {
 
 def handle_function(message: Message):
     if not message.media_path:
-        message.outgoing_text_message = "Attach an image to solve."
+        message.outgoing_text_message = f"Attach an image to solve. And write `/{pluginInfo['command_name']}` in the caption."
         message.send_message()
         return
     response = requests.post(
