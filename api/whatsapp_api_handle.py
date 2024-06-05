@@ -4,6 +4,7 @@ from pathlib import Path
 import importlib.util
 from .appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
+from shlex import split
 
 # load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
@@ -93,7 +94,7 @@ class Message:
 
         if self.incoming_text_message.startswith("/"):
             self.incoming_text_message = self.incoming_text_message[1:].strip()
-            self.arguments = self.get_arguments(self.incoming_text_message)
+            self.arguments = split(self.incoming_text_message)
 
             if appSettings.admin_command_prefix == self.arguments[0]:
                 if self.sender in appSettings.admin_ids:
@@ -105,22 +106,6 @@ class Message:
             self.incoming_text_message = data["image"]["caption"].replace("\xa0", " ")
             self.media_mime_type = data["image"]["mime_type"]
             self.media_path = data["image"]["media_path"]
-
-    def get_arguments(self, command):
-        arguments = []
-        while command:
-            if command[0] == '"':
-                end = command.find('"', 1)
-                arguments.append(command[: end + 1])
-                command = command[end + 2 :]
-            else:
-                end = command.find(" ")
-                if end == -1:
-                    arguments.append(command)
-                    break
-                arguments.append(command[:end])
-                command = command[end + 1 :]
-        return arguments
 
     @staticmethod
     def getGroupAndSenderId(string):
