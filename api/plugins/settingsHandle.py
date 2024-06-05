@@ -13,7 +13,7 @@ pluginInfo = {
 def handle_function(message: Message):
     settingArgs = parser(message.arguments)
     if isinstance(settingArgs, str):
-        message.outgoing_text_message = '\n> '.join(settingArgs.split('\n'))
+        message.outgoing_text_message = settingArgs
     elif settingArgs.change:
         appSettings.update(settingArgs.change[0], settingArgs.change[1])
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed to `{settingArgs.change[1]}`."
@@ -34,5 +34,14 @@ def parser(args: str):
     try:
         parse = parser.parse_args(args)
     except SystemExit:
-        return parser.format_help()
+        return f"""*Usage:*
+- Change settings:
+`/settings -c [setting] [value]`
+- View settings:
+`/settings -g [setting]`
+- View all settings:
+`/settings -g all`
+
+*Available settings:*
+{', '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
     return parse
