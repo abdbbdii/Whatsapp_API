@@ -164,6 +164,7 @@ class API:
 
     def message_handle(self):
         self.message.outgoing_text_message = "Hello, I am a bot. Use `/help` to see available commands."
+        self.message.send_message()
 
     def command_handle(self):
         if (self.message.arguments == [""]) or (self.message.arguments[0] == "help"):
