@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 pluginInfo = {
     "command_name": "blacklist",
-    "adminPrivilege": True,
+    "admin_privilege": True,
     "description": "Add or remove a number from blacklist.",
     "internal": False,
 }

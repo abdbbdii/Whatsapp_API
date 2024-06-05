@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 pluginInfo = {
     "command_name": "admin",
-    "adminPrivilege": True,
+    "admin_privilege": True,
     "description": "Add or remove an admin.",
     "internal": False,
 }
@@ -13,7 +13,7 @@ pluginInfo = {
 def handle_function(message: Message):
     try:
         parsed = parser(message.arguments[1:])
-        
+
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
