@@ -26,8 +26,6 @@ View all settings:
 *Available settings:*
 - {'\n- '.join(appSettings.list())}"""
         message.send_message()
-        message.outgoing_text_message = str(appSettings.list())
-        message.send_message()
         return
     if settingArgs.change:
         appSettings.update(settingArgs.change[0], settingArgs.change[1])
