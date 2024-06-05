@@ -96,6 +96,7 @@ openai_api_key: {self.openai_api_key}"""
 
 
     def list(self):
+        print([attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")])
         return [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
 
     def dict(self):
