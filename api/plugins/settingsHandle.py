@@ -34,7 +34,7 @@ View all settings:
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed to `{settingArgs.change[1]}`."
     elif settingArgs.get:
         if settingArgs.get == "all":
-            message.outgoing_text_message = "\n".join([appSettings.dict()])
+            message.outgoing_text_message = "\n".join([f"{setting}: {getattr(appSettings, setting)}" for setting in appSettings.list()])
         else:
             message.outgoing_text_message = f"{settingArgs.get}: {getattr(appSettings, settingArgs.get)}"
     else:
