@@ -19,7 +19,7 @@ def handle_function(message: Message):
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed to `{settingArgs.change[1]}`."
     elif settingArgs.get:
         if settingArgs.get == "all":
-            message.outgoing_text_message = "\n".join([f"{attr}: {getattr(appSettings, attr)}" for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])
+            message.outgoing_text_message = "\n".join([f"{attr}: {getattr(appSettings, attr)}" for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")])
         else:
             message.outgoing_text_message = f"{settingArgs.get}: {getattr(appSettings, settingArgs.get)}"
     else:
@@ -30,7 +30,7 @@ def handle_function(message: Message):
 def parser(args: str):
     parser = ArgumentParser(description="change and view settings.")
     parser.add_argument("-c", "--change", type=str, nargs=2, help="Change settings")
-    parser.add_argument("-g", "--get", type=str, choices=[attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')] + ["all"], help="View settings.")
+    parser.add_argument("-g", "--get", type=str, choices=[attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")] + ["all"], help="View settings.")
     try:
         parse = parser.parse_args(args)
     except SystemExit:
