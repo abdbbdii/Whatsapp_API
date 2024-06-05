@@ -34,13 +34,14 @@ def parser(args: str):
     try:
         parse = parser.parse_args(args)
     except SystemExit:
+        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         return f"""*Usage:*
 Change settings:
-`/settings -c [setting] [value]`
+`/{pretext}settings -c [setting] [value]`
 View settings:
-`/settings -g [setting]`
+`/{pretext}settings -g [setting]`
 View all settings:
-`/settings -g all`
+`/{pretext}settings -g all`
 
 *Available settings:*
 - {'\n- '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
