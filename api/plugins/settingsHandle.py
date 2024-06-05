@@ -43,5 +43,5 @@ def parser(args: str):
 `/settings -g all`
 
 *Available settings:*
-{', '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
+- {'\n - '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
     return parse
