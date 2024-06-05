@@ -47,5 +47,5 @@ def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="Add or remove a number from blacklist.")
     parser.add_argument("-a", "--add", nargs="+", help="Add member(s) to blacklist.")
     parser.add_argument("-r", "--remove", type=str, nargs="+", choices=appSettings.blacklist_ids, help="Remove member(s) from blacklist.")
-    parser.add_argument("-g", "--get", action="store_true", help="Get blacklist.")
+    parser.add_argument("-g", "--get", action="store_true", default=True, help="Get blacklist.")
     return parser.parse_args(args)

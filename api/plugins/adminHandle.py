@@ -47,5 +47,5 @@ def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="Add or remove an admin.")
     parser.add_argument("-a", "--add", nargs="+", help="Add admin(s).")
     parser.add_argument("-r", "--remove", type=str, nargs="+", choices=appSettings.admin_ids, help="Remove admin(s).")
-    parser.add_argument("-g", "--get", action="store_true", help="Get admin list.")
+    parser.add_argument("-g", "--get", action="store_true", default=True, help="Get admin list.")
     return parser.parse_args(args)
