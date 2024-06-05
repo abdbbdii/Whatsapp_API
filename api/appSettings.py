@@ -41,19 +41,7 @@ class AppSettings:
         self.openai_api_key = settings.openai_api_key
 
     def __str__(self) -> str:
-        return f"""admin_ids: {self.admin_ids}
-whatsapp_client_url: {self.whatsapp_client_url}
-public_url: {self.public_url}
-blacklist_ids: {self.blacklist_ids}
-admin_command_prefix: {self.admin_command_prefix}
-classroom_group_id: {self.classroom_group_id}
-reminders_api_classroom_id: {self.reminders_api_classroom_id}
-reminders_api_classroom_name: {self.reminders_api_classroom_name}
-reminders_key: {self.reminders_key}
-token_pickle_base64: {self.token_pickle_base64}
-google_credentials: {self.google_credentials}
-ocr_space_api_key: {self.ocr_space_api_key}
-openai_api_key: {self.openai_api_key}"""
+        return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
 
     def update(self, key, value):
         setattr(self, key, value)
@@ -93,7 +81,6 @@ openai_api_key: {self.openai_api_key}"""
                 setattr(settings, field.name, "")
 
         settings.save()
-
 
     def list(self):
         return [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
