@@ -12,6 +12,8 @@ pluginInfo = {
 
 def handle_function(message: Message):
     try:
+        if len(message.arguments) == 1:
+            raise SystemExit
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
@@ -30,15 +32,15 @@ def handle_function(message: Message):
     if parsed.add:
         for number in parsed.add:
             appSettings.append("blacklist_ids", number)
-        message.outgoing_text_message = f"Blacklisted: {', '.join(parsed.add)}."
+        message.outgoing_text_message = f"*Blacklisted*: {', '.join(parsed.add)}."
 
     elif parsed.remove:
         for number in parsed.remove:
             appSettings.remove("blacklist_ids", number)
-        message.outgoing_text_message = f"Removed from blacklist: {', '.join(parsed.remove)}."
+        message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(parsed.remove)}."
 
     elif parsed.get:
-        message.outgoing_text_message = "Blacklisted: " + ", ".join(appSettings.blacklist_ids)
+        message.outgoing_text_message = "*Blacklisted*: " + ", ".join(appSettings.blacklist_ids)
 
     message.send_message()
 
@@ -47,5 +49,5 @@ def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="Add or remove a number from blacklist.")
     parser.add_argument("-a", "--add", nargs="+", help="Add member(s) to blacklist.")
     parser.add_argument("-r", "--remove", type=str, nargs="+", choices=appSettings.blacklist_ids, help="Remove member(s) from blacklist.")
-    parser.add_argument("-g", "--get", action="store_true", default=True, help="Get blacklist.")
+    parser.add_argument("-g", "--get", action="store_true", help="Get blacklist.")
     return parser.parse_args(args)

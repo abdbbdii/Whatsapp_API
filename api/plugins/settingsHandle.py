@@ -12,8 +12,10 @@ pluginInfo = {
 
 def handle_function(message: Message):
     try:
+        if len(message.arguments) == 1:
+            raise SystemExit
         parsed = parser(message.arguments[1:])
-        
+
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
