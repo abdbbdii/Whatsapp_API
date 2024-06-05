@@ -11,10 +11,23 @@ pluginInfo = {
 
 
 def handle_function(message: Message):
-    settingArgs = parser(message.arguments)
-    if isinstance(settingArgs, str):
-        message.outgoing_text_message = settingArgs
-    elif settingArgs.change:
+    try:
+        settingArgs = parser(message.arguments)
+    except SystemExit:
+        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
+        message.outgoing_text_message = f"""*Usage:*
+Change settings:
+`/{pretext}settings -c [setting] [value]`
+View settings:
+`/{pretext}settings -g [setting]`
+View all settings:
+`/{pretext}settings -g all`
+
+*Available settings:*
+- {'\n- '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
+        message.send_message()
+        return
+    if settingArgs.change:
         appSettings.update(settingArgs.change[0], settingArgs.change[1])
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed to `{settingArgs.change[1]}`."
     elif settingArgs.get:
@@ -25,24 +38,12 @@ def handle_function(message: Message):
     else:
         message.outgoing_text_message = "Invalid arguments."
     message.send_message()
+    message.outgoing_text_message = str([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")] + ["all"])
+    message.send_message()
 
 
-def parser(args: str):
+def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="change and view settings.")
     parser.add_argument("-c", "--change", type=str, nargs=2, help="Change settings")
     parser.add_argument("-g", "--get", type=str, choices=[attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")] + ["all"], help="View settings.")
-    try:
-        parse = parser.parse_args(args)
-    except SystemExit:
-        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
-        return f"""*Usage:*
-Change settings:
-`/{pretext}settings -c [setting] [value]`
-View settings:
-`/{pretext}settings -g [setting]`
-View all settings:
-`/{pretext}settings -g all`
-
-*Available settings:*
-- {'\n- '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
-    return parse
+    return parser.parse_args(args)
