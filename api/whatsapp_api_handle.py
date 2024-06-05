@@ -187,8 +187,8 @@ class API:
 
     def set_help(self):
         help_message = []
+        prefix = appSettings.admin_command_prefix + " " if self.message.admin_privilege else ""
         for _, plugin in self.plugins.items():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                prefix = appSettings.admin_command_prefix + " " if plugin.admin_privilege else ""
                 help_message.append(f"- `/{prefix + plugin.command_name}`: {plugin.description}")
-        self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n'.join(help_message)}"
+        self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n'.join(help_message.append(f'- `/{prefix}help`: Show this message.'))}"
