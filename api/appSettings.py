@@ -95,6 +95,13 @@ openai_api_key: {self.openai_api_key}"""
         settings.save()
 
 
+    def list(self):
+        return [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
+
+    def dict(self):
+        return {attr: getattr(self, attr) for attr in self.list()}
+
+
 try:
     appSettings = AppSettings()
 except ProgrammingError:
