@@ -6,12 +6,16 @@ import requests
 pluginInfo = {
     "command_name": "solve",
     "admin_privilege": False,
-    "description": "Solve the given image using OCR.",
+    "description": "Solve the simple and multiple-choice questions in the image.",
     "internal": False,
 }
 
 
 def handle_function(message: Message):
+    if not message.media_path:
+        message.outgoing_text_message = "Attach an image to solve."
+        message.send_message()
+        return
     response = requests.post(
         "https://api.ocr.space/parse/image",
         files={

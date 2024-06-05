@@ -3,7 +3,7 @@ from api.appSettings import appSettings
 from argparse import ArgumentParser
 
 pluginInfo = {
-    "command_name": "settings",
+    "command_name": "setting",
     "admin_privilege": True,
     "description": "Change and view settings.",
     "internal": False,
@@ -20,11 +20,11 @@ def handle_function(message: Message):
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
 - Change settings:
-`/{pretext}settings -c [setting] [value]`
+`/{pretext+pluginInfo["command_name"]} -c [setting] [value]`
 - View settings:
-`/{pretext}settings -g [setting]`
+`/{pretext+pluginInfo["command_name"]} -g [setting]`
 - View all settings:
-`/{pretext}settings -g all`
+`/{pretext+pluginInfo["command_name"]} -g all`
 
 *Available settings:*
 - {'\n- '.join(appSettings.list())}"""

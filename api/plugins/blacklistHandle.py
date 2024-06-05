@@ -20,11 +20,11 @@ def handle_function(message: Message):
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
 - Add member(s) to blacklist:
-`/{pretext}blacklist -a [number] [number]...`
+`/{pretext+pluginInfo["command_name"]} -a [number] [number]...`
 - Remove member(s) from blacklist:
-`/{pretext}blacklist -r [number] [number]...`
+`/{pretext+pluginInfo["command_name"]} -r [number] [number]...`
 - Get blacklist:
-`/{pretext}blacklist -g`
+`/{pretext+pluginInfo["command_name"]} -g`
 """
         message.send_message()
         return

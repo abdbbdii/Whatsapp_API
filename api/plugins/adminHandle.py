@@ -20,11 +20,11 @@ def handle_function(message: Message):
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
 - Add admin(s):
-`/{pretext}admin -a [number] [number]...`
+`/{pretext+pluginInfo["command_name"]} -a [number] [number]...`
 - Remove admin(s):
-`/{pretext}admin -r [number] [number]...`
+`/{pretext+pluginInfo["command_name"]} -r [number] [number]...`
 - Get admin list:
-`/{pretext}admin -g`
+`/{pretext+pluginInfo["command_name"]} -g`
 """
         message.send_message()
         return
