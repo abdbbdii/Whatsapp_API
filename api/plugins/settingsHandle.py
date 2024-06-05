@@ -16,12 +16,12 @@ def handle_function(message: Message):
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
-Change settings:
-`/{pretext}settings -c [setting] [value]`
-View settings:
-`/{pretext}settings -g [setting]`
-View all settings:
-`/{pretext}settings -g all`
+- Change settings:
+> /{pretext}settings -c [setting] [value]
+- View settings:
+> /{pretext}settings -g [setting]
+- View all settings:
+> /{pretext}settings -g all
 
 *Available settings:*
 - {'\n- '.join(appSettings.list())}"""

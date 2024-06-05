@@ -192,4 +192,4 @@ class API:
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message.append(f"- `/{prefix + plugin.command_name}`: {plugin.description}")
         help_message.append(f'- `/{prefix}help`: Show this message.')
-        self.message.outgoing_text_message = f"*Available commands:*\n\n{'\n'.join(help_message)}"
+        self.message.outgoing_text_message = f"*Available commands:*\n{'\n'.join(help_message)}"
