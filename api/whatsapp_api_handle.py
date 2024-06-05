@@ -158,25 +158,16 @@ class API:
 
         try:
             self.command_handle() if self.message.arguments else self.message_handle()
-
         except CommandNotFound or EmptyCommand or SenderNotAdmin as e:
             self.message.outgoing_text_message = e
-
-        # except Exception as e:
-        # self.message.outgoing_text_message = f"*Error:*\n```{e}```\n\nThis error has been reported to admins, please try again later in the next update."
-        # self.message.send_message()
-
-        # self.message.send_to = appSettings.get("adminIds")
-        # self.message.outgoing_text_message = f"An error occurred while trying to process message from: {self.message.sender} in {self.message.group}.\nSender Name: ({data.get('pushname')})\n\n> {self.message.incoming_text_message.replace('\n', '\n> ')}\n\n```{e}```"
-        # self.message.send_message()
+            self.message.send_message()
 
     def message_handle(self):
-        raise NotImplementedError("Message handling is not implemented.")  # TODO
+        self.message.outgoing_text_message = "Hello, I am a bot. Use `/help` to see available commands."
 
     def command_handle(self):
         if (self.message.arguments == [""]) or (self.message.arguments[0] == "help"):
-            self.set_help()
-            self.message.send_message()
+            self.send_help()
 
         elif self.plugins.get(self.message.arguments[0]):
             if self.plugins[self.message.arguments[0]].admin_privilege == self.message.admin_privilege:
@@ -185,11 +176,12 @@ class API:
         else:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `/help` to see available commands.")
 
-    def set_help(self):
+    def send_help(self):
         help_message = []
         prefix = appSettings.admin_command_prefix + " " if self.message.admin_privilege else ""
         for _, plugin in self.plugins.items():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message.append(f"- `/{prefix + plugin.command_name}`: {plugin.description}")
-        help_message.append(f'- `/{prefix}help`: Show this message.')
+        help_message.append(f"- `/{prefix}help`: Show this message.")
         self.message.outgoing_text_message = f"*Available commands:*\n{'\n'.join(help_message)}"
+        self.message.send_message()

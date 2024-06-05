@@ -11,19 +11,15 @@ class AppSettings:
     def __init__(self) -> None:
         settings_values = {}
         settings = Settings.objects.first()
-
         if not settings:
             settings = Settings()
-
         for field in settings._meta.fields:
             value = getattr(settings, field.name)
             if not value or value == "":
                 value = os.getenv(field.name.upper())
                 if value:
                     setattr(settings, field.name, value)
-
             settings_values[field.name] = value
-
         settings.save()
 
         self.whatsapp_client_url = settings.whatsapp_client_url_test if django_settings.DEBUG else settings.whatsapp_client_url
@@ -48,13 +44,10 @@ class AppSettings:
             setattr(self, key, value.split(","))
         else:
             setattr(self, key, value)
-
         settings = Settings.objects.first()
-
         if key in ["whatsapp_client_url", "public_url", "classroom_group_id", "reminders_api_classroom_id", "reminders_api_classroom_name"]:
             if django_settings.DEBUG:
                 key += "_test"
-
         setattr(settings, key, value)
         settings.save()
 
@@ -79,9 +72,7 @@ class AppSettings:
     def empty(self):
         for field in self.__dict__:
             setattr(self, field, "")
-
         settings = Settings.objects.first()
-
         for field in settings._meta.fields:
             if field.name != "id":
                 setattr(settings, field.name, "")
