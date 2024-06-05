@@ -50,7 +50,7 @@ class AppSettings:
             setattr(self, key, value)
 
         settings = Settings.objects.first()
-        
+
         if key in ["whatsapp_client_url", "public_url", "classroom_group_id", "reminders_api_classroom_id", "reminders_api_classroom_name"]:
             if django_settings.DEBUG:
                 key += "_test"
@@ -59,19 +59,22 @@ class AppSettings:
         settings.save()
 
     def append(self, key, value):
+        if not isinstance(getattr(self, key), list):
+            raise ValueError(f"{key} is not a list.")
         getattr(self, key).append(value)
         settings = Settings.objects.first()
         setattr(settings, key, ",".join(getattr(self, key)))
         settings.save()
 
     def remove(self, key, value):
+        if not isinstance(getattr(self, key), list):
+            raise ValueError(f"{key} is not a list.")
         getattr(self, key).remove(value)
         settings = Settings.objects.first()
         setattr(settings, key, ",".join(getattr(self, key)))
         settings.save()
 
     def empty(self):
-
         for field in self.__dict__:
             setattr(self, field, "")
 
