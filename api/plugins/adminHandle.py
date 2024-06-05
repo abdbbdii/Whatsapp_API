@@ -38,7 +38,7 @@ def handle_function(message: Message):
         message.outgoing_text_message = f"Admin(s) removed: {', '.join(parsed.remove)}."
 
     elif parsed.get:
-        message = "Admins: " + ", ".join(appSettings.admin_ids)
+        message.outgoing_text_message = "Admins: " + ", ".join(appSettings.admin_ids)
 
     message.send_message()
 

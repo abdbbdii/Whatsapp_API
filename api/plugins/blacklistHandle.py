@@ -38,7 +38,7 @@ def handle_function(message: Message):
         message.outgoing_text_message = f"Removed from blacklist: {', '.join(parsed.remove)}."
 
     elif parsed.get:
-        message = "Blacklisted: " + ", ".join(appSettings.blacklist_ids)
+        message.outgoing_text_message = "Blacklisted: " + ", ".join(appSettings.blacklist_ids)
 
     message.send_message()
 
