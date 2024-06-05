@@ -43,13 +43,14 @@ class AppSettings:
     def __str__(self) -> str:
         return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
 
-    def update(self, key, value):
-        setattr(self, key, value)
+    def update(self, key: str, value: str):
+        if isinstance(getattr(self, key), list):
+            setattr(self, key, value.split(","))
+        else:
+            setattr(self, key, value)
+
         settings = Settings.objects.first()
-
-        if isinstance(getattr(settings, key), list):
-            value = ",".join(value)
-
+        
         if key in ["whatsapp_client_url", "public_url", "classroom_group_id", "reminders_api_classroom_id", "reminders_api_classroom_name"]:
             if django_settings.DEBUG:
                 key += "_test"
