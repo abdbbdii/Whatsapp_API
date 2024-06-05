@@ -38,8 +38,10 @@ def handle_function(message: Message):
     elif parsed.get:
         if parsed.get == "all":
             message.outgoing_text_message = "\n".join([f"- *{setting}*: {getattr(appSettings, setting)}" for setting in appSettings.list()])
-        else:
+        elif hasattr(appSettings, parsed.get):
             message.outgoing_text_message = f"*{parsed.get}*: {getattr(appSettings, parsed.get)}"
+        else:
+            message.outgoing_text_message = f"Setting `{parsed.get}` not found."
 
     else:
         message.outgoing_text_message = "Invalid arguments."
@@ -50,5 +52,5 @@ def handle_function(message: Message):
 def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="change and view settings.")
     parser.add_argument("-c", "--change", type=str, nargs=2, help="Change settings")
-    parser.add_argument("-g", "--get", type=str, default="all", choices=appSettings.list().append("all"), help="View settings.")
+    parser.add_argument("-g", "--get", type=str, default="all", help="View settings.")
     return parser.parse_args(args)

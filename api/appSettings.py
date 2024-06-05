@@ -69,6 +69,8 @@ class AppSettings:
     def remove(self, key, value):
         if not isinstance(getattr(self, key), list):
             raise ValueError(f"{key} is not a list.")
+        if not value in getattr(self, key):
+            raise ValueError(f"{value} is not in {key}.")
         getattr(self, key).remove(value)
         settings = Settings.objects.first()
         setattr(settings, key, ",".join(getattr(self, key)))

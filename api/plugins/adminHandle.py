@@ -36,8 +36,11 @@ def handle_function(message: Message):
 
     elif parsed.remove:
         for number in parsed.remove:
-            appSettings.remove("admin_ids", number)
-        message.outgoing_text_message = f"*Admin(s) removed*: {', '.join(parsed.remove)}."
+            try:
+                appSettings.remove("admin_ids", number)
+                message.outgoing_text_message = f"*Admin(s) removed*: {', '.join(parsed.remove)}."
+            except ValueError:
+                message.outgoing_text_message = f"{number} is not an admin."
 
     elif parsed.get:
         message.outgoing_text_message = "*Admins*: " + ", ".join(appSettings.admin_ids)
@@ -48,6 +51,6 @@ def handle_function(message: Message):
 def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="Add or remove an admin.")
     parser.add_argument("-a", "--add", nargs="+", help="Add admin(s).")
-    parser.add_argument("-r", "--remove", type=str, nargs="+", choices=appSettings.admin_ids, help="Remove admin(s).")
+    parser.add_argument("-r", "--remove", type=str, nargs="+", help="Remove admin(s).")
     parser.add_argument("-g", "--get", action="store_true", help="Get admin list.")
     return parser.parse_args(args)
