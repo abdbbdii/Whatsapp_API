@@ -26,6 +26,8 @@ View all settings:
 *Available settings:*
 - {'\n- '.join([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith('__')])}"""
         message.send_message()
+        message.outgoing_text_message = str([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")] + ["all"])
+        message.send_message()
         return
     if settingArgs.change:
         appSettings.update(settingArgs.change[0], settingArgs.change[1])
@@ -37,8 +39,6 @@ View all settings:
             message.outgoing_text_message = f"{settingArgs.get}: {getattr(appSettings, settingArgs.get)}"
     else:
         message.outgoing_text_message = "Invalid arguments."
-    message.send_message()
-    message.outgoing_text_message = str([attr for attr in dir(appSettings) if not callable(getattr(appSettings, attr)) and not attr.startswith("__")] + ["all"])
     message.send_message()
 
 
