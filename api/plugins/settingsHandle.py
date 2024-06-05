@@ -35,11 +35,11 @@ def parser(args: str):
         parse = parser.parse_args(args)
     except SystemExit:
         return f"""*Usage:*
-- Change settings:
+Change settings:
 `/settings -c [setting] [value]`
-- View settings:
+View settings:
 `/settings -g [setting]`
-- View all settings:
+View all settings:
 `/settings -g all`
 
 *Available settings:*
