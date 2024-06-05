@@ -13,7 +13,7 @@ pluginInfo = {
 def handle_function(message: Message):
     settingArgs = parser(message.arguments)
     if isinstance(settingArgs, str):
-        message.outgoing_text_message = settingArgs
+        message.outgoing_text_message = '\n> '.join(settingArgs.split('\n'))
     elif settingArgs.change:
         appSettings.update(settingArgs.change[0], settingArgs.change[1])
         message.outgoing_text_message = f"Setting `{settingArgs.change[0]}` changed to `{settingArgs.change[1]}`."
