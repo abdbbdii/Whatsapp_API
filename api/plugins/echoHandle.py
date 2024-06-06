@@ -39,7 +39,7 @@ Attach image with caption: `/{pretext+pluginInfo["command_name"]}`"""
 
     if message.media_path:
         # TODO
-        message.media = {"file": ("file." + message.media_mime_type.split("/")[-1], get(appSettings.whatsapp_client_url + message.media_path).content)}
+        message.media = {"file": (message.media_mime_type.replace("/", "."), get(appSettings.whatsapp_client_url + message.media_path).content)}
         message.send_file(caption=True)
     else:
         message.send_message()
