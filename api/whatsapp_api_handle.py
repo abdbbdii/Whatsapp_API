@@ -5,6 +5,7 @@ import importlib.util
 from .appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
 from shlex import split
+from typing import Any
 
 # load_dotenv(find_dotenv()) if not os.getenv("VERCEL_ENV") else None
 
@@ -58,18 +59,24 @@ class Plugin:
 
 
 class Message:
-    def __init__(self, data):
+    def __init__(self, data: dict):
+        self.senderId: str | None
+        self.groupId: str | None
+        self.sender: str | None
+        self.group: str | None
+
         self.senderId, self.groupId = self.getGroupAndSenderId(data["from"])
         self.sender, self.group = map(lambda id: re.sub(r"^(\d+).*[:@].*$", r"\1", id) if id else None, [self.senderId, self.groupId])
-        self.arguments = None
-        self.admin_privilege = False
-        self.incoming_text_message = None
-        self.outgoing_text_message = None
-        self.send_to = [self.senderId if self.groupId is None else self.groupId]
-        self.document = data.get("document")
-        self.media_mime_type = None
-        self.media_path = None
-        self.media = None
+
+        self.arguments: list[str | int | float] | None = None
+        self.admin_privilege: bool = False
+        self.incoming_text_message: str | None = None
+        self.outgoing_text_message: str | None = None
+        self.send_to: str = [self.senderId if self.groupId is None else self.groupId]
+        self.document: Any | None = data.get("document")
+        self.media_mime_type: str | None = None
+        self.media_path: str | None = None
+        self.media: bytes | None = None
 
         self.set_media(data)
         self.set_incoming_text_message(data)
@@ -202,7 +209,7 @@ class API:
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message.update({prefix + plugin.command_name: plugin.description})
         help_message.update({prefix + "help": "Show this message."})
-        
+
         self.message.outgoing_text_message = "*Available commands:*\n"
         for command, description in help_message.items():
             self.message.outgoing_text_message += f"- `/{command}`: {description}\n"
