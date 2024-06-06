@@ -34,12 +34,12 @@ def handle_function(message: Message):
             appSettings.append("blacklist_ids", number)
         message.outgoing_text_message = f"*Blacklisted*: {', '.join(parsed.add)}."
 
-    elif parsed.remove:
+    if parsed.remove:
         for number in parsed.remove:
             appSettings.remove("blacklist_ids", number)
         message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(parsed.remove)}."
 
-    elif parsed.get:
+    if parsed.get:
         message.outgoing_text_message = "*Blacklisted*: " + ", ".join(appSettings.blacklist_ids)
 
     message.send_message()

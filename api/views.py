@@ -6,8 +6,8 @@ from .appSettings import appSettings
 def whatsapp(request):
     if request.method == "POST":
         print("POST /api/whatsapp")
+        print(json.loads(request.body.decode("utf-8")))
         API(json.loads(request.body.decode("utf-8")))
-        print("Message sent successfully.")
         return JsonResponse({"statusCode": 200, "message": "Message sent successfully."})
     else:
         return JsonResponse({"message": "Authorization required."})
@@ -23,7 +23,6 @@ def classroom(request):
                 "message": {"text": "./classroom"},
             }
         )
-        print("Notification sent successfully.")
         return JsonResponse({"statusCode": 200, "message": "Notification sent successfully."})
     else:
         return JsonResponse({"message": "Authorization required."})
@@ -39,7 +38,6 @@ def reminder(request):
                 "message": {"text": "./reminder"},
             }
         )
-        print("Reminder sent successfully.")
         return JsonResponse({"statusCode": 200, "message": "Reminder sent successfully."})
     else:
         return JsonResponse({"message": "Authorization required."})

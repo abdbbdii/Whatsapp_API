@@ -35,7 +35,7 @@ def handle_function(message: Message):
         appSettings.update(parsed.change[0], parsed.change[1])
         message.outgoing_text_message = f"Setting `{parsed.change[0]}` changed to `{parsed.change[1]}`."
 
-    elif parsed.get:
+    if parsed.get:
         if parsed.get == "all":
             message.outgoing_text_message = "\n".join([f"- *{setting}*: {getattr(appSettings, setting)}" for setting in appSettings.list()])
         elif hasattr(appSettings, parsed.get):
@@ -52,5 +52,5 @@ def handle_function(message: Message):
 def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="change and view settings.")
     parser.add_argument("-c", "--change", type=str, nargs=2, help="Change settings")
-    parser.add_argument("-g", "--get", type=str, default="all", help="View settings.")
+    parser.add_argument("-g", "--get", type=str, help="View settings.")
     return parser.parse_args(args)

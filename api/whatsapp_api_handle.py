@@ -125,29 +125,47 @@ class Message:
             }
             print(requests.post(appSettings.whatsapp_client_url + "send/message", data=body).text)
 
-    def send_file(self):
+    def send_file(self, caption=False):
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message,
+                "caption": self.outgoing_text_message if caption else None,
             }
             print(requests.post(appSettings.whatsapp_client_url + "send/file", data=body, files=self.media).text)
 
-    def send_audio(self):
+    def send_audio(self, caption=False):
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "message": self.outgoing_text_message,
+                "caption": self.outgoing_text_message if caption else None,
             }
             print(requests.post(appSettings.whatsapp_client_url + "send/audio", data=body, files=self.media).text)
 
-    def send_image(self):
+    def send_image(self, caption=False):
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "message": self.outgoing_text_message,
+                "caption": self.outgoing_text_message if caption else None,
             }
             print(requests.post(appSettings.whatsapp_client_url + "send/image", data=body, files=self.media).text)
+
+    def send_video(self, caption=False):
+        for phone in self.send_to:
+            body = {
+                "phone": phone,
+                "caption": self.outgoing_text_message if caption else None,
+            }
+            print(requests.post(appSettings.whatsapp_client_url + "send/video", data=body, files=self.media).text)
+
+    def send_media(self, caption=False):
+        if self.media_mime_type == "audio/ogg":
+            self.send_audio(caption)
+        elif self.media_mime_type == "image/jpeg":
+            self.send_image(caption)
+        elif self.media_mime_type == "video/mp4":
+            self.send_video(caption)
+        else:
+            self.send_file(caption)
 
 
 class API:
@@ -178,11 +196,14 @@ class API:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `/help` to see available commands.")
 
     def send_help(self):
-        help_message = []
+        help_message = {}
         prefix = appSettings.admin_command_prefix + " " if self.message.admin_privilege else ""
         for _, plugin in self.plugins.items():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                help_message.append(f"- `/{prefix + plugin.command_name}`: {plugin.description}")
-        help_message.append(f"- `/{prefix}help`: Show this message.")
-        self.message.outgoing_text_message = f"*Available commands:*\n{'\n'.join(help_message)}"
+                help_message.update({prefix + plugin.command_name: plugin.description})
+        help_message.update({prefix + "help": "Show this message."})
+        
+        self.message.outgoing_text_message = "*Available commands:*\n"
+        for command, description in help_message.items():
+            self.message.outgoing_text_message += f"- `/{command}`: {description}\n"
         self.message.send_message()

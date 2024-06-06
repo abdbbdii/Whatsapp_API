@@ -34,7 +34,7 @@ def handle_function(message: Message):
             appSettings.append("admin_ids", number)
         message.outgoing_text_message = f"*Admin(s) added*: {', '.join(parsed.add)}."
 
-    elif parsed.remove:
+    if parsed.remove:
         for number in parsed.remove:
             try:
                 appSettings.remove("admin_ids", number)
@@ -42,7 +42,7 @@ def handle_function(message: Message):
             except ValueError:
                 message.outgoing_text_message = f"{number} is not an admin."
 
-    elif parsed.get:
+    if parsed.get:
         message.outgoing_text_message = "*Admins*: " + ", ".join(appSettings.admin_ids)
 
     message.send_message()
