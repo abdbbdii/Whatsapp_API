@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import timedelta
 
 
 class Settings(models.Model):
@@ -20,3 +21,17 @@ class Settings(models.Model):
     google_credentials = models.TextField(default="", null=True)
     ocr_space_api_key = models.TextField(default="", null=True)
     openai_api_key = models.TextField(default="", null=True)
+    kharchey_group_id = models.TextField(default="", null=True)
+
+class Kharchey(models.Model):
+    item = models.TextField(default="", null=True)
+    quantity = models.IntegerField(default=0, null=True)
+    price = models.IntegerField(default=0, null=True)
+    date = models.DateTimeField(auto_now_add=True, null=True)
+    group = models.TextField(default="", null=True)
+    sender = models.TextField(default="", null=True)
+
+    def save(self, *args, **kwargs):
+        if self.date is not None:
+            self.date += timedelta(hours=5)
+        super(Kharchey, self).save(*args, **kwargs)

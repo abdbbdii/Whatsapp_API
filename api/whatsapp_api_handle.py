@@ -70,10 +70,10 @@ class Message:
 
         self.arguments: list[str | int | float] | None = None
         self.admin_privilege: bool = False
-        self.incoming_text_message: str | None = None
+        self.incoming_text_message: str | None = ""
         self.outgoing_text_message: str | None = None
         self.link: str | None = None
-        self.send_to: str = [self.senderId if self.groupId is None else self.groupId]
+        self.send_to: list = [self.senderId if self.groupId is None else self.groupId]
         self.document: Any | None = data.get("document")
         self.media_mime_type: str | None = None
         self.media_path: str | None = None
@@ -86,6 +86,12 @@ class Message:
         if not self.media_path:
             self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
 
+        # special case for kharchey plugin --------------------------------------
+        # start
+        if self.send_to[0] == appSettings.kharchey_group_id + "@g.us" and not self.incoming_text_message.startswith("./kharchey"):
+            self.incoming_text_message = "./kharchey " + self.incoming_text_message if self.incoming_text_message else "./kharchey List"
+        # end -------------------------------------------------------------------
+
         if self.incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
@@ -94,9 +100,8 @@ class Message:
             raise SenderNotAdmin("Sender is not an admin.")
 
         if self.group:
-            match = re.search(r"\.([^\.].*)", self.incoming_text_message)
-            if match:
-                self.incoming_text_message = str(match.group(1))
+            if re.search(r"\.[^\.].*", self.incoming_text_message):
+                self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
             else:
                 raise EmptyMessageInGroup("Message is empty in group.")
 

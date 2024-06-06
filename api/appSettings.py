@@ -35,6 +35,7 @@ class AppSettings:
         self.google_credentials = settings.google_credentials
         self.ocr_space_api_key = settings.ocr_space_api_key
         self.openai_api_key = settings.openai_api_key
+        self.kharchey_group_id = settings.kharchey_group_id
 
     def __str__(self) -> str:
         return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
@@ -104,5 +105,6 @@ except ProgrammingError:
             self.google_credentials = ""
             self.ocr_space_api_key = ""
             self.openai_api_key = ""
+            self.kharchey_group_id = ""
 
     appSettings = AppSettings()
