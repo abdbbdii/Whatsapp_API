@@ -33,16 +33,11 @@ Attach image with caption: `/{pretext+pluginInfo["command_name"]}`"""
 
     if parsed.message:
         message.outgoing_text_message = " ".join(parsed.message)
-
-    else:
-        message.outgoing_text_message = "Invalid arguments."
-
-    if message.media_path:
-        # TODO
-        message.media = {"file": (message.media_mime_type.replace("/", "."), get(appSettings.whatsapp_client_url + message.media_path).content)}
-        message.send_file(caption=True)
-    else:
-        message.send_message()
+        if message.media_path:
+            message.media = {"file": (message.media_mime_type.replace("/", "."), get(appSettings.whatsapp_client_url + message.media_path).content)}
+            message.send_file(caption=True)
+        else:
+            message.send_message()
 
 
 def parser(args: str) -> ArgumentParser:

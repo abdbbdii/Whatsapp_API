@@ -33,6 +33,7 @@ def handle_function(message: Message):
         for number in parsed.add:
             appSettings.append("admin_ids", number)
         message.outgoing_text_message = f"*Admin(s) added*: {', '.join(parsed.add)}."
+        message.send_message()
 
     if parsed.remove:
         for number in parsed.remove:
@@ -41,11 +42,12 @@ def handle_function(message: Message):
                 message.outgoing_text_message = f"*Admin(s) removed*: {', '.join(parsed.remove)}."
             except ValueError:
                 message.outgoing_text_message = f"{number} is not an admin."
+        message.send_message()
 
     if parsed.get:
         message.outgoing_text_message = "*Admins*: " + ", ".join(appSettings.admin_ids)
+        message.send_message()
 
-    message.send_message()
 
 
 def parser(args: str) -> ArgumentParser:

@@ -34,6 +34,7 @@ def handle_function(message: Message):
     if parsed.change:
         appSettings.update(parsed.change[0], parsed.change[1])
         message.outgoing_text_message = f"Setting `{parsed.change[0]}` changed to `{parsed.change[1]}`."
+        message.send_message()
 
     if parsed.get:
         if parsed.get == "all":
@@ -42,11 +43,7 @@ def handle_function(message: Message):
             message.outgoing_text_message = f"*{parsed.get}*: {getattr(appSettings, parsed.get)}"
         else:
             message.outgoing_text_message = f"Setting `{parsed.get}` not found."
-
-    else:
-        message.outgoing_text_message = "Invalid arguments."
-
-    message.send_message()
+        message.send_message()
 
 
 def parser(args: str) -> ArgumentParser:

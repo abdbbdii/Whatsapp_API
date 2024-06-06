@@ -33,16 +33,21 @@ def handle_function(message: Message):
         for number in parsed.add:
             appSettings.append("blacklist_ids", number)
         message.outgoing_text_message = f"*Blacklisted*: {', '.join(parsed.add)}."
+        message.send_message()
 
     if parsed.remove:
         for number in parsed.remove:
-            appSettings.remove("blacklist_ids", number)
-        message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(parsed.remove)}."
+            try:
+                appSettings.remove("blacklist_ids", number)
+                message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(parsed.remove)}."
+            except ValueError:
+                message.outgoing_text_message = f"{number} is not in blacklist."
+        message.send_message()
 
     if parsed.get:
         message.outgoing_text_message = "*Blacklisted*: " + ", ".join(appSettings.blacklist_ids)
+        message.send_message()
 
-    message.send_message()
 
 
 def parser(args: str) -> ArgumentParser:
