@@ -72,6 +72,7 @@ class Message:
         self.admin_privilege: bool = False
         self.incoming_text_message: str | None = None
         self.outgoing_text_message: str | None = None
+        self.link: str | None = None
         self.send_to: str = [self.senderId if self.groupId is None else self.groupId]
         self.document: Any | None = data.get("document")
         self.media_mime_type: str | None = None
@@ -131,6 +132,15 @@ class Message:
                 "message": self.outgoing_text_message,
             }
             print(requests.post(appSettings.whatsapp_client_url + "send/message", data=body).text)
+
+    def send_link(self):
+        for phone in self.send_to:
+            body = {
+                "phone": phone,
+                "caption": self.outgoing_text_message,
+                "link": self.link,
+            }
+            print(requests.post(appSettings.whatsapp_client_url + "send/link", data=body).text)
 
     def send_file(self, caption=False):
         for phone in self.send_to:

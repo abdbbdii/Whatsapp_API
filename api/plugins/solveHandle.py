@@ -16,6 +16,7 @@ def handle_function(message: Message):
         message.outgoing_text_message = f"Attach an image and write `/{pluginInfo['command_name']}` in the caption."
         message.send_message()
         return
+    
     response = requests.post(
         "https://api.ocr.space/parse/image",
         files={

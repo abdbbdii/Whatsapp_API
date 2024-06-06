@@ -19,8 +19,8 @@ def handle_function(message: Message):
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
-- Add member(s) to blacklist: `/{pretext+pluginInfo["command_name"]} -a [number] [number]...`
-- Remove member(s) from blacklist: `/{pretext+pluginInfo["command_name"]} -r [number] [number]...`
+- Add members to blacklist: `/{pretext+pluginInfo["command_name"]} -a [number] [number]...`
+- Remove members from blacklist: `/{pretext+pluginInfo["command_name"]} -r [number] [number]...`
 - Get blacklist: `/{pretext+pluginInfo["command_name"]} -g`"""
         message.send_message()
         return
@@ -45,10 +45,9 @@ def handle_function(message: Message):
         message.send_message()
 
 
-
 def parser(args: str) -> ArgumentParser:
     parser = ArgumentParser(description="Add or remove a number from blacklist.")
-    parser.add_argument("-a", "--add", nargs="+", help="Add member(s) to blacklist.")
-    parser.add_argument("-r", "--remove", type=str, nargs="+", choices=appSettings.blacklist_ids, help="Remove member(s) from blacklist.")
+    parser.add_argument("-a", "--add", nargs="+", help="Add members to blacklist.")
+    parser.add_argument("-r", "--remove", type=str, nargs="+", help="Remove members from blacklist.")
     parser.add_argument("-g", "--get", action="store_true", help="Get blacklist.")
     return parser.parse_args(args)
