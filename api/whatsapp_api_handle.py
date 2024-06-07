@@ -112,6 +112,8 @@ class Message:
             if appSettings.admin_command_prefix == self.arguments[0] and self.sender in appSettings.admin_ids:
                 self.admin_privilege = True
                 self.arguments = self.arguments[1:]
+                if not self.arguments:
+                    self.arguments = ["help"]
 
     def set_media(self, data):
         if data["image"]:
@@ -207,7 +209,7 @@ class API:
 
     def command_handle(self):
         if self.message.arguments[0] == appSettings.admin_command_prefix and not self.message.admin_privilege:
-            raise SenderNotAdmin("Sender is not an admin.")
+            raise SenderNotAdmin("You are not an admin and cannot use admin commands.")
 
         if (self.message.arguments == [""]) or (self.message.arguments[0] == "help"):
             self.send_help()
