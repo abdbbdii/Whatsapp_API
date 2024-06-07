@@ -32,6 +32,7 @@ class EmptyCommand(Exception):
 class CommandNotFound(Exception):
     pass
 
+
 class MessageNotValid(Exception):
     pass
 
@@ -89,7 +90,6 @@ class Message:
         if not self.media_path:
             self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
 
-
         if self.incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
@@ -103,7 +103,7 @@ class Message:
             else:
                 # special case for kharchey plugin ---------------------------------------------------------------------------------------------
                 if self.group == appSettings.kharchey_group_id and self.incoming_text_message:
-                    self.incoming_text_message = "./kharchey " + self.incoming_text_message
+                    self.incoming_text_message = "/kharchey " + self.incoming_text_message
                 else:
                     raise MessageNotValid("Message does not start with a dot.")
                 # ------------------------------------------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ class API:
 
         try:
             self.command_handle() if self.message.arguments else self.message_handle()
-        except CommandNotFound or EmptyCommand or SenderNotAdmin as e:
+        except CommandNotFound or SenderNotAdmin as e:
             self.message.outgoing_text_message = e
             self.message.send_message()
 
@@ -216,6 +216,8 @@ class API:
         elif self.plugins.get(self.message.arguments[0]):
             if self.plugins[self.message.arguments[0]].admin_privilege == self.message.admin_privilege:
                 self.plugins[self.message.arguments[0]].handle_function(self.message)
+            else:
+                raise SenderNotAdmin("Sender is not an admin.")
 
         else:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `/help` to see available commands.")
