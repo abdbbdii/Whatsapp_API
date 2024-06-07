@@ -204,7 +204,7 @@ class API:
             self.message.send_message()
 
     def message_handle(self):
-        self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix} {appSettings.admin_command_prefix}help` if you are an admin) to see available commands."
+        self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix+appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
         self.message.send_message()
 
     def command_handle(self):
