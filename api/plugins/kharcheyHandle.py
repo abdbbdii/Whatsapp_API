@@ -1,8 +1,6 @@
 from api.whatsapp_api_handle import Message
 import re
 from api.models import Kharchey
-from django.db.models import F, Sum
-import datetime
 
 pluginInfo = {
     "command_name": "kharchey",
@@ -61,7 +59,7 @@ _Note: Only the person who added the item can clear it._"""
     else:
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
         message.outgoing_text_message = "*💵 Kharchey 💵*\n\n"
-        
+
         for message_item in message_items:
             if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", message_item):
                 price = int(match.group(1))
