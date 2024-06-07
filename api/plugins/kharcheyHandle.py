@@ -14,22 +14,23 @@ pluginInfo = {
 
 def handle_function(message: Message):
 
-    def get_list(header=True):
+    def get_list():
         total = 0
-        outgoing_text_message = "*💵 Kharchey 💵*\n\n" if header else ""
-        items = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
-        for i, item in enumerate(items):
+        outgoing_text_message = ""
+        for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
             outgoing_text_message += f"{i+1}. `{item.date.strftime('%d/%m/%Y %H:%M')}` - {item.item} {item.quantity}x{item.price} = {item.quantity * item.price}\n"
             total += item.quantity * item.price
         outgoing_text_message += f"\n*Total: {total}*"
         return outgoing_text_message
 
     if message.arguments[1] == "List" or message.arguments[1] == "list":
-        message.outgoing_text_message = get_list()
+        message.outgoing_text_message = "*💵 Kharchey 💵*\n\n"
+        message.outgoing_text_message += get_list()
         message.send_message()
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
         message.outgoing_text_message = """*💵 Kharchey Commands 💵*
+
 - `List`: Get list of items
 - `Clear`: Clear all items
 - `Clear [item#1] [item#2] ...`: Clear specific item
@@ -60,6 +61,7 @@ _Note: Only the person who added the item can clear it._"""
     else:
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
         message.outgoing_text_message = "*💵 Kharchey 💵*\n\n"
+        
         for message_item in message_items:
             if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", message_item):
                 price = int(match.group(1))
@@ -69,22 +71,23 @@ _Note: Only the person who added the item can clear it._"""
                 if match.group(2):
                     price, quantity = quantity, price
 
-                thing = {
+                instance = {
                     "price": price,
                     "quantity": quantity,
                     "item": item,
                 }
-                instance = Kharchey.objects.create(
-                    item=thing["item"],
-                    quantity=thing["quantity"],
-                    price=thing["price"],
+
+                Kharchey.objects.create(
+                    item=instance["item"],
+                    quantity=instance["quantity"],
+                    price=instance["price"],
                     group=message.group,
                     sender=message.sender,
-                )
-                instance.save()
-                message.outgoing_text_message += f"Added {thing['quantity']}x{thing['price']} {thing['item']}\n"
+                ).save()
+
+                message.outgoing_text_message += f"Added {instance['quantity']}x{instance['price']} {instance['item']}\n"
 
         if message.outgoing_text_message != "*💵 Kharchey 💵*\n\n":
-            message.outgoing_text_message += "\n*💵 Total 💵*\n\n"
-            message.outgoing_text_message += get_list(False)
+            message.outgoing_text_message += "\n*List*\n\n"
+            message.outgoing_text_message += get_list()
             message.send_message()
