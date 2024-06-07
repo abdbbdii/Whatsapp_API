@@ -13,10 +13,11 @@ pluginInfo = {
 
 def handle_function(message: Message):
     if not message.media_path:
-        message.outgoing_text_message = f"Attach an image and write `/{pluginInfo['command_name']}` in the caption."
+        message.outgoing_text_message = f"""*Usage:*
+- Send an image caption: `{message.command_prefix+pluginInfo['command_name']}`"""
         message.send_message()
         return
-    
+
     response = requests.post(
         "https://api.ocr.space/parse/image",
         files={

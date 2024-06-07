@@ -68,6 +68,7 @@ class Message:
         self.senderId, self.groupId = self.getGroupAndSenderId(data["from"])
         self.sender, self.group = map(lambda id: re.sub(r"^(\d+).*[:@].*$", r"\1", id) if id else None, [self.senderId, self.groupId])
 
+        self.command_prefix = "./" if self.group else "/"
         self.arguments: list[str | int | float] | None = None
         self.admin_privilege: bool = False
         self.incoming_text_message: str | None = ""
@@ -201,7 +202,7 @@ class API:
             self.message.send_message()
 
     def message_handle(self):
-        self.message.outgoing_text_message = "Hello, I am a bot. Use `/help` to see available commands."
+        self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` to see available commands."
         self.message.send_message()
 
     def command_handle(self):
@@ -216,7 +217,7 @@ class API:
                 self.plugins[self.message.arguments[0]].handle_function(self.message)
 
         else:
-            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `/help` to see available commands.")
+            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `{self.message.command_prefix}help` to see available commands.")
 
     def send_help(self):
         help_message = {}
@@ -228,5 +229,5 @@ class API:
 
         self.message.outgoing_text_message = "*Available commands:*\n"
         for command, description in help_message.items():
-            self.message.outgoing_text_message += f"- `/{command}`: {description}\n"
+            self.message.outgoing_text_message += f"- `{self.message.command_prefix + command}`: {description}\n"
         self.message.send_message()

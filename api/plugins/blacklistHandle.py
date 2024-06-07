@@ -19,9 +19,9 @@ def handle_function(message: Message):
     except SystemExit:
         pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
         message.outgoing_text_message = f"""*Usage:*
-- Add members to blacklist: `/{pretext+pluginInfo["command_name"]} -a [number] [number]...`
-- Remove members from blacklist: `/{pretext+pluginInfo["command_name"]} -r [number] [number]...`
-- Get blacklist: `/{pretext+pluginInfo["command_name"]} -g`"""
+- Add members to blacklist: `{message.command_prefix+pretext+pluginInfo["command_name"]} -a [number] [number]...`
+- Remove members from blacklist: `{message.command_prefix+pretext+pluginInfo["command_name"]} -r [number] [number]...`
+- Get blacklist: `{message.command_prefix+pretext+pluginInfo["command_name"]} -g`"""
         message.send_message()
         return
 
