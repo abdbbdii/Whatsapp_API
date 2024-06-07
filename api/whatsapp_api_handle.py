@@ -25,10 +25,6 @@ class EmptyMessageInGroup(Exception):
     pass
 
 
-class EmptyCommand(Exception):
-    pass
-
-
 class CommandNotFound(Exception):
     pass
 
@@ -95,7 +91,7 @@ class Message:
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
             raise SenderInBlackList("Sender is in blacklist.")
         elif self.sender not in appSettings.admin_ids and DEBUG:
-            raise SenderNotAdmin("Sender is not an admin.")
+            raise PermissionError("Debug mode is enabled.")
 
         if self.group:
             if re.search(r"\.[^\.].*", self.incoming_text_message):
@@ -112,10 +108,9 @@ class Message:
             self.incoming_text_message = self.incoming_text_message[1:].strip()
             self.arguments = split(self.incoming_text_message)
 
-            if appSettings.admin_command_prefix == self.arguments[0]:
-                if self.sender in appSettings.admin_ids:
-                    self.admin_privilege = True
-                    self.arguments = self.arguments[1:]
+            if appSettings.admin_command_prefix == self.arguments[0] and self.sender in appSettings.admin_ids:
+                self.admin_privilege = True
+                self.arguments = self.arguments[1:]
 
     def set_media(self, data):
         if data["image"]:
@@ -210,14 +205,15 @@ class API:
         self.message.send_message()
 
     def command_handle(self):
+        if self.message.arguments[0] == appSettings.admin_command_prefix and not self.message.admin_privilege:
+            raise SenderNotAdmin("Sender is not an admin.")
+
         if (self.message.arguments == [""]) or (self.message.arguments[0] == "help"):
             self.send_help()
 
         elif self.plugins.get(self.message.arguments[0]):
             if self.plugins[self.message.arguments[0]].admin_privilege == self.message.admin_privilege:
                 self.plugins[self.message.arguments[0]].handle_function(self.message)
-            else:
-                raise SenderNotAdmin("Sender is not an admin.")
 
         else:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `/help` to see available commands.")
