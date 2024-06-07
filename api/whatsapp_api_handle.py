@@ -197,7 +197,7 @@ class API:
 
         try:
             self.command_handle() if self.message.arguments else self.message_handle()
-        except CommandNotFound or SenderNotAdmin as e:
+        except (CommandNotFound, SenderNotAdmin) as e:
             self.message.outgoing_text_message = e
             self.message.send_message()
 
