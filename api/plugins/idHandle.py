@@ -1,6 +1,4 @@
 from api.whatsapp_api_handle import Message
-from api.appSettings import appSettings
-from argparse import ArgumentParser
 
 pluginInfo = {
     "command_name": "id",

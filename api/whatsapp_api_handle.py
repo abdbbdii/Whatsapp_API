@@ -32,6 +32,9 @@ class EmptyCommand(Exception):
 class CommandNotFound(Exception):
     pass
 
+class MessageNotValid(Exception):
+    pass
+
 
 class Plugin:
     def __init__(self, command_name, admin_privilege, description, handle_function, internal):
@@ -86,11 +89,6 @@ class Message:
         if not self.media_path:
             self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
 
-        # special case for kharchey plugin --------------------------------------
-        # start
-        if self.send_to[0] == appSettings.kharchey_group_id + "@g.us" and not self.incoming_text_message.startswith("./kharchey"):
-            self.incoming_text_message = "./kharchey " + self.incoming_text_message if self.incoming_text_message else "./kharchey List"
-        # end -------------------------------------------------------------------
 
         if self.incoming_text_message == "" and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
@@ -103,7 +101,12 @@ class Message:
             if re.search(r"\.[^\.].*", self.incoming_text_message):
                 self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
             else:
-                raise EmptyMessageInGroup("Message is empty in group.")
+                # special case for kharchey plugin ---------------------------------------------------------------------------------------------
+                if self.group == appSettings.kharchey_group_id and self.incoming_text_message:
+                    self.incoming_text_message = "./kharchey " + self.incoming_text_message
+                else:
+                    raise MessageNotValid("Message does not start with a dot.")
+                # ------------------------------------------------------------------------------------------------------------------------------
 
         if self.incoming_text_message.startswith("/"):
             self.incoming_text_message = self.incoming_text_message[1:].strip()
