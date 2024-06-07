@@ -20,11 +20,11 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
+        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
         message.outgoing_text_message = f"""*Usage:*
-- Echo message: `{message.command_prefix+pretext+pluginInfo["command_name"]} [message]`
-- Echo image with caption: Attach image with caption: `/{pretext+pluginInfo["command_name"]} [caption]`
-- Echo image without caption: Attach image with caption: `/{pretext+pluginInfo["command_name"]}`"""
+- Echo message: `{pretext} [message]`
+- Echo image with caption: Attach image with caption: `{pretext} [caption]`
+- Echo image without caption: Attach image with caption: `{pretext}`"""
         message.send_message()
         return
 

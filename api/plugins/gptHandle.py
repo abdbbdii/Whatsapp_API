@@ -19,10 +19,10 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
+        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
         message.outgoing_text_message = f"""*Usage:*
-- Chat with the AI: `{message.command_prefix+pretext+pluginInfo["command_name"]} [message]`
-- Chat with the AI using a specific model: `{message.command_prefix+pretext+pluginInfo["command_name"]} -m [model] [message]`"""
+- Chat with the AI: `{pretext} [message]`
+- Chat with the AI using a specific model: `{pretext} -m [model] [message]`"""
         message.send_message()
         return
 

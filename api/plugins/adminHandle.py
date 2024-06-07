@@ -17,11 +17,11 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else ""
+        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
         message.outgoing_text_message = f"""*Usage:*
-- Add admins: `{message.command_prefix+pretext+pluginInfo["command_name"]} -a [number] [number]...`
-- Remove admins: `{message.command_prefix+pretext+pluginInfo["command_name"]} -r [number] [number]...`
-- Get admin list: `{message.command_prefix+pretext+pluginInfo["command_name"]} -g`"""
+- Add admins: `{pretext} -a [number] [number]...`
+- Remove admins: `{pretext} -r [number] [number]...`
+- Get admin list: `{pretext} -g`"""
         message.send_message()
         return
 

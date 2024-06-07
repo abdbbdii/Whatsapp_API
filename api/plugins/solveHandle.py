@@ -13,8 +13,9 @@ pluginInfo = {
 
 def handle_function(message: Message):
     if not message.media_path:
+        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
         message.outgoing_text_message = f"""*Usage:*
-- Send an image caption: `{message.command_prefix+pluginInfo['command_name']}`"""
+- Send an image caption: `{pretext}`"""
         message.send_message()
         return
 
