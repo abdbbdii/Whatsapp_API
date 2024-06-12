@@ -17,7 +17,7 @@ def handle_function(message: Message):
         outgoing_text_message = ""
         for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
             time = f"{item.date.day}/{item.date.month}/{item.date.year} {item.date.hour%12 if item.date.hour%12 != 0 else 12}:{item.date.minute} {'AM' if item.date.hour < 12 else 'PM'}"
-            outgoing_text_message += f"{i+1}. `{time}` - {item.item} {str(item.quantity)+'x' if item.quantity != 1 else ""}{item.price} = {item.quantity * item.price}\n"
+            outgoing_text_message += f"{i+1}. `{time}` {item.item} {str(item.quantity)+'x' if item.quantity != 1 else ""}{item.price} = {item.quantity * item.price}\n"
             total += item.quantity * item.price
         outgoing_text_message += f"\n*Total: {total}*"
         return outgoing_text_message
