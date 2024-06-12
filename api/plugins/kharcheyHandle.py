@@ -23,12 +23,12 @@ def handle_function(message: Message):
         return outgoing_text_message
 
     if message.arguments[1] == "List" or message.arguments[1] == "list":
-        message.outgoing_text_message = "*💵 Kharchey 💵*\n"
+        message.outgoing_text_message = "*💵 List 💵*\n"
         message.outgoing_text_message += get_list()
         message.send_message()
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
-        message.outgoing_text_message = """*💵 Kharchey Commands 💵*
+        message.outgoing_text_message = """*💵 Help 💵*
 
 - `List`: Get list of items
 - `Clear`: Clear all items from list
@@ -59,7 +59,6 @@ _Note: Only the person who added the item can clear it._"""
 
     else:
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
-        message.outgoing_text_message = "*💵 Kharchey 💵*\n"
 
         for message_item in message_items:
             if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", message_item):
@@ -86,7 +85,7 @@ _Note: Only the person who added the item can clear it._"""
 
                 message.outgoing_text_message += f"Added *{instance['item']}* to list\n"
 
-        if message.outgoing_text_message != "*💵 Kharchey 💵*\n":
-            message.outgoing_text_message += "\n*List*\n"
+        if message.outgoing_text_message:
+            message.outgoing_text_message += "\n*💵 List 💵*\n"
             message.outgoing_text_message += get_list()
             message.send_message()

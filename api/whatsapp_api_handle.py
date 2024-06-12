@@ -72,7 +72,7 @@ class Message:
         self.admin_privilege: bool = False
         self.incoming_message_id: Optional[str] = data["message"]["id"]
         self.incoming_text_message: Optional[str] = ""
-        self.outgoing_text_message: Optional[str] = None
+        self.outgoing_text_message: Optional[str] = ""
         self.link: Optional[str] = None
         self.send_to: List[str] = [self.senderId if self.groupId is None else self.groupId]
         self.document: Optional[Any] = data.get("document")
