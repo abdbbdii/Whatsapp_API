@@ -135,7 +135,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "message": self.outgoing_text_message,
+                "message": self.outgoing_text_message.strip(),
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/message", data=body)
             print(response.text)
@@ -144,7 +144,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message,
+                "caption": self.outgoing_text_message.strip(),
                 "link": self.link,
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/link", data=body)
@@ -154,7 +154,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message if caption else None,
+                "caption": self.outgoing_text_message.strip() if caption else None,
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/file", data=body, files=self.media)
             print(response.text)
@@ -163,7 +163,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message if caption else None,
+                "caption": self.outgoing_text_message.strip() if caption else None,
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/audio", data=body, files=self.media)
             print(response.text)
@@ -172,7 +172,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message if caption else None,
+                "caption": self.outgoing_text_message.strip() if caption else None,
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/image", data=body, files=self.media)
             print(response.text)
@@ -181,7 +181,7 @@ class Message:
         for phone in self.send_to:
             body = {
                 "phone": phone,
-                "caption": self.outgoing_text_message if caption else None,
+                "caption": self.outgoing_text_message.strip() if caption else None,
             }
             response = requests.post(appSettings.whatsapp_client_url + "send/video", data=body, files=self.media)
             print(response.text)
