@@ -29,7 +29,6 @@ def handle_function(message: Message):
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
         message.outgoing_text_message = """*💵 Help 💵*
-
 - `List`: Get list of items
 - `Clear`: Clear all items from list
 - `Clear [item#1] [item#2] ...`: Clear specific item from list
