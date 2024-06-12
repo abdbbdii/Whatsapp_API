@@ -48,7 +48,7 @@ _Note: Only the person who added the item can clear it._"""
                 if item_no.isdigit() and int(item_no) <= items_in_list:
                     item = Kharchey.objects.filter(group=message.group, sender=message.sender)[int(item_no) - 1]
                     item.delete()
-                    message.outgoing_text_message += f"Item {item_no} cleared\n"
+                    message.outgoing_text_message += f"Item {item_no} ({item.item}) cleared\n"
                 else:
                     message.outgoing_text_message += f"Item {item_no} not found\n"
         else:
