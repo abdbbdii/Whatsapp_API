@@ -70,6 +70,7 @@ class Message:
         self.command_prefix = "./" if self.group else "/"
         self.arguments: Optional[List[Union[str, int, float]]] = None
         self.admin_privilege: bool = False
+        self.incoming_message_id: Optional[str] = data["message"]["id"]
         self.incoming_text_message: Optional[str] = ""
         self.outgoing_text_message: Optional[str] = None
         self.link: Optional[str] = None

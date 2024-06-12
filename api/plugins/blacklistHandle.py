@@ -26,19 +26,36 @@ def handle_function(message: Message):
         return
 
     if parsed.add:
+        success = []
+        fail = []
         for number in parsed.add:
-            appSettings.append("blacklist_ids", number)
-        message.outgoing_text_message = f"*Blacklisted*: {', '.join(parsed.add)}."
-        message.send_message()
+            if number not in appSettings.blacklist_ids:
+                appSettings.append("blacklist_ids", number)
+                success.append(number)
+            else:
+                fail.append(number)
+        if success:
+            message.outgoing_text_message = f"*Added to blacklist*: {', '.join(success)}."
+            message.send_message()
+        if fail:
+            message.outgoing_text_message = f"*Already in blacklist*: {', '.join(fail)}."
+            message.send_message()
 
     if parsed.remove:
+        success = []
+        fail = []
         for number in parsed.remove:
-            try:
+            if number in appSettings.blacklist_ids:
                 appSettings.remove("blacklist_ids", number)
-                message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(parsed.remove)}."
-            except ValueError:
-                message.outgoing_text_message = f"{number} is not in blacklist."
-        message.send_message()
+                success.append(number)
+            else:
+                fail.append(number)
+        if success:
+            message.outgoing_text_message = f"*Removed from blacklist*: {', '.join(success)}."
+            message.send_message()
+        if fail:
+            message.outgoing_text_message = f"*Not in blacklist*: {', '.join(fail)}."
+            message.send_message()
 
     if parsed.get:
         message.outgoing_text_message = "*Blacklisted*: " + ", ".join(appSettings.blacklist_ids)

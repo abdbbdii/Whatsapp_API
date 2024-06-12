@@ -29,6 +29,7 @@ def handle_function(message: Message):
         return
 
     if parsed.message:
+        # TODO testing needed
         message.outgoing_text_message = " ".join(parsed.message)
         if message.media_path:
             message.media = {"file": (message.media_mime_type.replace("/", "."), get(appSettings.whatsapp_client_url + message.media_path).content)}

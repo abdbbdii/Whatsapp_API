@@ -35,6 +35,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     ".serveo.net",
     "localhost",
+    ".ddns.net",
+    os.getenv("PUBLIC_IP"),
 ]
 
 
