@@ -45,10 +45,10 @@ _Note: Only the person who added the item can clear it._"""
     elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
         if len(message.arguments) > 2:
             message.outgoing_text_message = ""
-            items_in_list = len(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date"))
+            items_in_list = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
             for item_no in message.arguments[2:]:
-                if item_no.isdigit() and int(item_no) <= items_in_list:
-                    item = Kharchey.objects.filter(group=message.group, sender=message.sender)[int(item_no) - 1]
+                if item_no.isdigit() and int(item_no) <= len(items_in_list):
+                    item = items_in_list[int(item_no) - 1]
                     item.delete()
                     message.outgoing_text_message += f"Item {item_no} ({item.item}) cleared\n"
                 else:
