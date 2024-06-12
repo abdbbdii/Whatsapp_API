@@ -16,7 +16,7 @@ def handle_function(message: Message):
         total = 0
         outgoing_text_message = ""
         for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
-            outgoing_text_message += f"{i+1}. `{item.date.strftime('%d/%m/%Y %H:%M')}` - {item.item} {item.quantity}x{item.price} = {item.quantity * item.price}\n"
+            outgoing_text_message += f"{i+1}. `{item.date.strftime('%d/%m/%Y %H:%M')}` - {item.item} {str(item.quantity)+'x' if item.quantity != 1 else ""}{item.price} = {item.quantity * item.price}\n"
             total += item.quantity * item.price
         outgoing_text_message += f"\n*Total: {total}*"
         return outgoing_text_message
@@ -30,8 +30,8 @@ def handle_function(message: Message):
         message.outgoing_text_message = """*💵 Kharchey Commands 💵*
 
 - `List`: Get list of items
-- `Clear`: Clear all items
-- `Clear [item#1] [item#2] ...`: Clear specific item
+- `Clear`: Clear all items from list
+- `Clear [item#1] [item#2] ...`: Clear specific item from list
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
 - `Help`: Show this message
@@ -83,7 +83,7 @@ _Note: Only the person who added the item can clear it._"""
                     sender=message.sender,
                 ).save()
 
-                message.outgoing_text_message += f"Added {instance['quantity']}x{instance['price']} {instance['item']}\n"
+                message.outgoing_text_message += f"Added {instance['item']} to list\n"
 
         if message.outgoing_text_message != "*💵 Kharchey 💵*\n\n":
             message.outgoing_text_message += "\n*List*\n\n"
