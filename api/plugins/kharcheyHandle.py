@@ -22,7 +22,7 @@ def handle_function(message: Message):
         return outgoing_text_message
 
     if message.arguments[1] == "List" or message.arguments[1] == "list":
-        message.outgoing_text_message = "*💵 Kharchey 💵*\n\n"
+        message.outgoing_text_message = "*💵 Kharchey 💵*\n"
         message.outgoing_text_message += get_list()
         message.send_message()
 
@@ -58,7 +58,7 @@ _Note: Only the person who added the item can clear it._"""
 
     else:
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
-        message.outgoing_text_message = "*💵 Kharchey 💵*\n\n"
+        message.outgoing_text_message = "*💵 Kharchey 💵*\n"
 
         for message_item in message_items:
             if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", message_item):
@@ -83,9 +83,9 @@ _Note: Only the person who added the item can clear it._"""
                     sender=message.sender,
                 ).save()
 
-                message.outgoing_text_message += f"Added {instance['item']} to list\n"
+                message.outgoing_text_message += f"Added *{instance['item']}* to list\n"
 
-        if message.outgoing_text_message != "*💵 Kharchey 💵*\n\n":
-            message.outgoing_text_message += "\n*List*\n\n"
+        if message.outgoing_text_message != "*💵 Kharchey 💵*\n":
+            message.outgoing_text_message += "\n*List*\n"
             message.outgoing_text_message += get_list()
             message.send_message()
