@@ -34,7 +34,7 @@ def handle_function(message: Message):
 
     if parsed.text:
         try:
-            message.media = (f"{'_'.join(parsed.text[:3])}.mp3", ttsResponse(" ".join(parsed.text), parsed.voice, parsed.model), "audio/mpeg")
+            message.media = {"file": (f"{'_'.join(parsed.text[:3])}.mp3", ttsResponse(" ".join(parsed.text), parsed.voice, parsed.model), "audio/mpeg")}
             message.send_audio()
         except NotFoundError:
             message.outgoing_text_message = "Model not found."

@@ -30,7 +30,7 @@ def handle_function(message: Message):
 
     if parsed.description:
         try:
-            message.media = (f"{'_'.join(parsed.description[:3])}.jpg", imgResponse(" ".join(parsed.description), parsed.model), "image/jpeg")
+            message.media = {"file": (f"{'_'.join(parsed.description[:3])}.jpg", imgResponse(" ".join(parsed.description), parsed.model), "image/jpeg")}
             message.send_image()
         except NotFoundError:
             message.outgoing_text_message = "Model not found."
