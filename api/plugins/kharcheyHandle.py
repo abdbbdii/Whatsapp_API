@@ -13,7 +13,7 @@ pluginInfo = {
 
 
 def preprocess(message: Message) -> None:
-    if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r'^\.(\s?\w+\.)+.+', message.incoming_text_message)):
+    if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)):
         message.incoming_text_message = "./kharchey " + message.incoming_text_message
 
 
