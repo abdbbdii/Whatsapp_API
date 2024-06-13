@@ -240,7 +240,7 @@ class API:
             if plugin.admin_privilege == self.message.admin_privilege:
                 plugin.handle_function(self.message)
         else:
-            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Use `{self.message.command_prefix}help` to see available commands.")
+            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` to see available commands.")
 
     def send_help(self) -> None:
         help_message = {}
