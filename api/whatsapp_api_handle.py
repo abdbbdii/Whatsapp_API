@@ -99,6 +99,8 @@ class Message:
 
     def process_incoming_text_message(self) -> None:
         if self.group:
+            print(self.incoming_text_message)
+            print(re.search(r'^\.(\s?\w+\.)+\w+', self.incoming_text_message))
             if re.search(r'^\.(\s?\w+\.)+\w+', self.incoming_text_message):
                 self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
             else:
