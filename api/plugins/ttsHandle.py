@@ -50,7 +50,7 @@ def parser(args: str) -> ArgumentParser:
 
 
 def ttsResponse(prompt, voice="alloy", model="tts-1"):
-    response = OpenAI(api_key=appSettings.get("openai_api_key")).audio.speech.create(
+    response = OpenAI(api_key=appSettings.openai_api_key).audio.speech.create(
         model=model,
         voice=voice,
         input=prompt,

@@ -45,7 +45,7 @@ def parser(args: str) -> ArgumentParser:
 
 
 def imgResponse(prompt, model="dall-e-2"):
-    response = OpenAI(api_key=appSettings.get("openai_api_key")).images.generate(
+    response = OpenAI(api_key=appSettings.openai_api_key).images.generate(
         model=model,
         prompt=prompt,
         size="1024x1024",
