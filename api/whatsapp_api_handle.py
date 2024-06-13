@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
-from django.core.cache import cache
 from django.utils import timezone
 from .appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
@@ -33,12 +32,13 @@ class MessageNotValid(Exception):
 
 
 class Plugin:
-    def __init__(self, command_name: str, admin_privilege: bool, description: str, handle_function: Any, internal: bool):
+    def __init__(self, command_name: str, admin_privilege: bool, description: str, handle_function: Any, preprocess: Any, internal: bool):
         self.command_name = command_name
         self.admin_privilege = admin_privilege
         self.description = description
         self.handle_function = handle_function
         self.internal = internal
+        self.preprocess = preprocess
 
     @staticmethod
     def load_plugins() -> Dict[str, "Plugin"]:
@@ -55,6 +55,7 @@ class Plugin:
                 description=plugin.pluginInfo["description"],
                 internal=plugin.pluginInfo["internal"],
                 handle_function=plugin.handle_function,
+                preprocess=plugin.preprocess if plugin.pluginInfo["internal"] else None,
             )
         return plugins
 
@@ -206,12 +207,9 @@ class API:
     def __init__(self, data: dict) -> None:
         self.request_timestamp = timezone.now()
         self.message = Message(data)
-        # special case for kharchey plugin -------------------------------------------
-        if self.message.group == appSettings.kharchey_group_id and self.message.incoming_text_message and not re.search(r"\.[^\.].*", self.message.incoming_text_message):
-            self.message.incoming_text_message = "./kharchey " + self.message.incoming_text_message
-        # ----------------------------------------------------------------------------
-        self.message.process_incoming_text_message()
         self.plugins = Plugin.load_plugins()
+        self.preprocess()
+        self.message.process_incoming_text_message()
 
         try:
             if self.message.arguments:
@@ -221,6 +219,11 @@ class API:
         except (CommandNotFound, SenderNotAdmin) as e:
             self.message.outgoing_text_message = str(e)
             self.message.send_message()
+
+    def preprocess(self) -> None:
+        for _, plugin in self.plugins.items():
+            if plugin.preprocess:
+                plugin.preprocess(self.message)
 
     def message_handle(self) -> None:
         self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."

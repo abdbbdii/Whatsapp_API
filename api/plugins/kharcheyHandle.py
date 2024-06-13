@@ -1,6 +1,8 @@
-from api.whatsapp_api_handle import Message
 import re
+
 from api.models import Kharchey
+from api.whatsapp_api_handle import Message
+from api.appSettings import appSettings
 
 pluginInfo = {
     "command_name": "kharchey",
@@ -9,8 +11,9 @@ pluginInfo = {
     "internal": True,
 }
 
-def is_internal_command(message: Message) -> bool:
-    return message.command == "kharchey"
+def preprocess(message: Message) -> None:
+    if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not re.search(r"\.[^\.].*", message.incoming_text_message):
+        message.incoming_text_message = "./kharchey " + message.incoming_text_message
 
 def handle_function(message: Message):
 

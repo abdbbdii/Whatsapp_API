@@ -8,6 +8,8 @@ pluginInfo = {
     "internal": True,
 }
 
+def preprocess(message: Message) -> None:
+    pass
 
 def handle_function(message: Message):
     for reminder in message.document["reminders_notified"]:
