@@ -99,7 +99,7 @@ class Message:
 
     def process_incoming_text_message(self) -> None:
         if self.group:
-            if re.search(r'^\.(\s?\w+\.)+.+', self.incoming_text_message):
+            if bool(re.match(r'^\.(\s?\w+\.)+.+', self.incoming_text_message)):
                 self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
             else:
                 raise MessageNotValid("Message does not start with a dot.")
