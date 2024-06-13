@@ -9,7 +9,7 @@ from api.whatsapp_api_handle import Message
 pluginInfo = {
     "command_name": "img",
     "admin_privilege": False,
-    "description": "Generate image.",
+    "description": "Generate image (Not working at the moment).",
     "internal": False,
 }
 

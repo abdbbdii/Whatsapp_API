@@ -4,6 +4,7 @@ from openai import OpenAI, NotFoundError
 
 from api.appSettings import appSettings
 from api.whatsapp_api_handle import Message
+from api.models import GPTResponse
 
 pluginInfo = {
     "command_name": "gpt",
@@ -29,24 +30,38 @@ def handle_function(message: Message):
 
     if parsed.prompt:
         try:
-            message.outgoing_text_message = gptResponse(" ".join(parsed.prompt), parsed.model)
+            message.outgoing_text_message = gptResponse(" ".join(parsed.prompt), parsed.model, get_previous_messages(message))
         except NotFoundError:
             message.outgoing_text_message = "Model not found."
         message.send_message()
+        save_response(message)
 
 
-def gptResponse(prompt, model):
+def gptResponse(prompt: str, model: str, previous_messages: list[dict[str, str]] | None = None) -> str:
     response = OpenAI(api_key=appSettings.openai_api_key).chat.completions.create(
         model=model,
         messages=[
             {
                 "role": "system",
-                "content": "You are a question answering bot. Be as precise as possible. And respond to the user's question. If you don't know the answer, just say cant answer.",
+                "content": "You are a whatsapp bot. You are assisting a user in a chat. If they need help or ask a question that you can't answer, tell them to contact owner. Number: +92 312 4996133, Name: abd.",
             },
-            {"role": "user", "content": "Here are some questions:\n\n" + prompt},
+            *previous_messages,
+            {"role": "user", "content": prompt},
         ],
     )
     return response.choices[0].message.content
+
+
+def get_previous_messages(message: Message) -> list[dict[str, str]]:
+    previous_messages = []
+    for response in GPTResponse.objects.filter(group=message.group, sender=message.sender).order_by("-date")[:5]:
+        previous_messages.append({"role": "user", "content": response.message})
+        previous_messages.append({"role": "assistant", "content": response.response})
+    return previous_messages
+
+
+def save_response(message: Message) -> None:
+    GPTResponse.objects.create(message=message.incoming_text_message, response=message.outgoing_text_message, group=message.group, sender=message.sender)
 
 
 def parser(args: str) -> ArgumentParser:

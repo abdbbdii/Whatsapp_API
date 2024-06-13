@@ -23,6 +23,7 @@ class Settings(models.Model):
     openai_api_key = models.TextField(default="", null=True)
     kharchey_group_id = models.TextField(default="", null=True)
 
+
 class Kharchey(models.Model):
     item = models.TextField(default="", null=True)
     quantity = models.IntegerField(default=0, null=True)
@@ -35,3 +36,16 @@ class Kharchey(models.Model):
         if self.date is not None:
             self.date += timedelta(hours=5)
         super(Kharchey, self).save(*args, **kwargs)
+
+
+class GPTResponse(models.Model):
+    message = models.TextField(default="", null=True)
+    response = models.TextField(default="", null=True)
+    group = models.TextField(default="", null=True)
+    sender = models.TextField(default="", null=True)
+    date = models.DateTimeField(auto_now_add=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.date is not None:
+            self.date += timedelta(hours=5)
+        super(GPTResponse, self).save(*args, **kwargs)

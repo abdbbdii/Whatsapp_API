@@ -106,7 +106,7 @@ class Message:
 
         if self.incoming_text_message.startswith("/"):
             self.incoming_text_message = self.incoming_text_message[1:].strip()
-            self.arguments = split(self.incoming_text_message)
+            self.arguments = self.incoming_text_message.split()
 
             if appSettings.admin_command_prefix == self.arguments[0] and self.sender in appSettings.admin_ids:
                 self.admin_privilege = True
