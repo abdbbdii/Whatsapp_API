@@ -6,7 +6,7 @@ import requests
 pluginInfo = {
     "command_name": "solve",
     "admin_privilege": False,
-    "description": "Solve the simple and multiple-choice questions in the image.",
+    "description": "Solve MCQs from an image",
     "internal": False,
 }
 
