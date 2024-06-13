@@ -12,10 +12,8 @@ pluginInfo = {
     "internal": True,
 }
 
-def preprocess(message: Message) -> None:
-    pass
 
-def add_minutes(date, time, minutes):
+def add_minutes(date: dict[str, int], time: dict[str, int], minutes: int):
     new_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) + timedelta(minutes=minutes)
     return (
         {"year": new_datetime.year, "month": new_datetime.month, "day": new_datetime.day},

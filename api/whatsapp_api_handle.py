@@ -55,7 +55,7 @@ class Plugin:
                 description=plugin.pluginInfo["description"],
                 internal=plugin.pluginInfo["internal"],
                 handle_function=plugin.handle_function,
-                preprocess=plugin.preprocess if plugin.pluginInfo["internal"] else None,
+                preprocess=plugin.preprocess if "preprocess" in dir(plugin) else None,
             )
         return plugins
 
