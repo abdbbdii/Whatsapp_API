@@ -1,4 +1,3 @@
-from base64 import b64decode
 from argparse import ArgumentParser
 
 from openai import OpenAI, NotFoundError
@@ -35,7 +34,7 @@ def handle_function(message: Message):
 
     if parsed.text:
         try:
-            message.media = (f"{'_'.join(parsed.text.split(' ')[:3])}.mp3", ttsResponse(" ".join(parsed.text), parsed.model), "audio/mpeg")
+            message.media = (f"{'_'.join(parsed.text[:3])}.mp3", ttsResponse(" ".join(parsed.text), parsed.model), "audio/mpeg")
             message.send_audio()
         except NotFoundError:
             message.outgoing_text_message = "Model not found."

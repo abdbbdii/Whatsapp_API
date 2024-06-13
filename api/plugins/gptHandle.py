@@ -1,7 +1,9 @@
-from api.whatsapp_api_handle import Message
-from api.appSettings import appSettings
 from argparse import ArgumentParser
+
 from openai import OpenAI, NotFoundError
+
+from api.appSettings import appSettings
+from api.whatsapp_api_handle import Message
 
 pluginInfo = {
     "command_name": "gpt",
