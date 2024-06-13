@@ -79,16 +79,16 @@ class Message:
         self.send_to: List[str] = [self.senderId if self.groupId is None else self.groupId]
         self.document: Optional[Any] = data.get("document")
         self.media_mime_type: Optional[str] = None
+        self.media_type: Optional[bytes] = None
         self.media_path: Optional[str] = None
         self.media: Optional[bytes] = None
 
-        self.set_media(data)
         self.set_incoming_text_message(data)
+        self.validate()
+        if self.media_type:
+            self.set_media(data)
 
-    def set_incoming_text_message(self, data: dict) -> None:
-        if not self.media_path:
-            self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
-
+    def validate(self) -> None:
         if not self.incoming_text_message and self.group:
             raise EmptyMessageInGroup("Message is empty in group.")
         elif self.sender not in appSettings.admin_ids and self.sender in appSettings.blacklist_ids:
@@ -96,11 +96,7 @@ class Message:
         elif self.sender not in appSettings.admin_ids and DEBUG:
             raise PermissionError("Debug mode is enabled.")
 
-        # special case for kharchey plugin -------------------------------------------
-        if self.group == appSettings.kharchey_group_id and self.incoming_text_message and not re.search(r"\.[^\.].*", self.incoming_text_message):
-            self.incoming_text_message = "./kharchey " + self.incoming_text_message
-        # ----------------------------------------------------------------------------
-
+    def process_incoming_text_message(self) -> None:
         if self.group:
             if re.search(r"\.[^\.].*", self.incoming_text_message):
                 self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
@@ -117,11 +113,18 @@ class Message:
                 if not self.arguments:
                     self.arguments = ["help"]
 
+    def set_incoming_text_message(self, data: dict) -> None:
+        for media_type in ["image", "video", "audio", "document", "sticker"]:
+            if data.get(media_type):
+                self.incoming_text_message = data[media_type]["caption"].replace("\xa0", " ")
+                self.media_type = media_type
+                return
+        self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
+
     def set_media(self, data: dict) -> None:
-        if data.get("image"):
-            self.incoming_text_message = data["image"]["caption"].replace("\xa0", " ")
-            self.media_mime_type = data["image"]["mime_type"]
-            self.media_path = data["image"]["media_path"]
+        self.incoming_text_message = data[self.media_type]["caption"].replace("\xa0", " ")
+        self.media_mime_type = data[self.media_type]["mime_type"]
+        self.media_path = data[self.media_type]["media_path"]
 
     @staticmethod
     def get_group_and_sender_id(string: str) -> Tuple[Optional[str], Optional[str]]:
@@ -203,11 +206,12 @@ class API:
     def __init__(self, data: dict) -> None:
         self.request_timestamp = timezone.now()
         self.message = Message(data)
-        self.plugins = cache.get("plugins")
-        if not self.plugins:
-            self.plugins = Plugin.load_plugins()
-            cache.set("plugins", self.plugins)
-            print("Plugins loaded")
+        # special case for kharchey plugin -------------------------------------------
+        if self.message.group == appSettings.kharchey_group_id and self.message.incoming_text_message and not re.search(r"\.[^\.].*", self.message.incoming_text_message):
+            self.message.incoming_text_message = "./kharchey " + self.message.incoming_text_message
+        # ----------------------------------------------------------------------------
+        self.message.process_incoming_text_message()
+        self.plugins = Plugin.load_plugins()
 
         try:
             if self.message.arguments:
