@@ -9,6 +9,8 @@ pluginInfo = {
     "internal": True,
 }
 
+def is_internal_command(message: Message) -> bool:
+    return message.command == "kharchey"
 
 def handle_function(message: Message):
 

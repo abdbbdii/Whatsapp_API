@@ -1,13 +1,15 @@
-from django.utils import timezone
-import requests
 import re
 import os
-from pathlib import Path
 import importlib.util
+from shlex import split
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import requests
+from django.core.cache import cache
+from django.utils import timezone
 from .appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
-from shlex import split
-from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 class SenderInBlackList(Exception):
@@ -94,16 +96,16 @@ class Message:
         elif self.sender not in appSettings.admin_ids and DEBUG:
             raise PermissionError("Debug mode is enabled.")
 
+        # special case for kharchey plugin -------------------------------------------
+        if self.group == appSettings.kharchey_group_id and self.incoming_text_message and not re.search(r"\.[^\.].*", self.incoming_text_message):
+            self.incoming_text_message = "./kharchey " + self.incoming_text_message
+        # ----------------------------------------------------------------------------
+
         if self.group:
             if re.search(r"\.[^\.].*", self.incoming_text_message):
                 self.incoming_text_message = self.incoming_text_message.lstrip(".").strip()
             else:
-                # special case for kharchey plugin ---------------------------------------------------------------------------------------------
-                if self.group == appSettings.kharchey_group_id and self.incoming_text_message:
-                    self.incoming_text_message = "/kharchey " + self.incoming_text_message
-                else:
-                    raise MessageNotValid("Message does not start with a dot.")
-                # ------------------------------------------------------------------------------------------------------------------------------
+                raise MessageNotValid("Message does not start with a dot.")
 
         if self.incoming_text_message.startswith("/"):
             self.incoming_text_message = self.incoming_text_message[1:].strip()
@@ -201,7 +203,11 @@ class API:
     def __init__(self, data: dict) -> None:
         self.request_timestamp = timezone.now()
         self.message = Message(data)
-        self.plugins = Plugin.load_plugins()
+        self.plugins = cache.get("plugins")
+        if not self.plugins:
+            self.plugins = Plugin.load_plugins()
+            cache.set("plugins", self.plugins)
+            print("Plugins loaded")
 
         try:
             if self.message.arguments:
