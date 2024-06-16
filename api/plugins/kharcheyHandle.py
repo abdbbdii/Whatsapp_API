@@ -16,30 +16,28 @@ def preprocess(message: Message) -> None:
     if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)):
         message.incoming_text_message = "./kharchey " + message.incoming_text_message
 
-def parse_item(text: str) -> dict[str, str]:
-    if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", text):
-        price = int(match.group(1))
-        quantity = int(match.group(2)) if match.group(2) else 1
-        item = match.group(3)
-
-        if match.group(2):
-            price, quantity = quantity, price
-
-        return {
-            "price": price,
-            "quantity": quantity,
-            "item": item,
-        }
-    return {}
 
 def handle_function(message: Message):
+    def parse_item(text: str) -> dict[str, str]:
+        if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", text):
+            price = int(match.group(1))
+            quantity = int(match.group(2)) if match.group(2) else 1
+            item = match.group(3)
+            if match.group(2):
+                price, quantity = quantity, price
+            return {
+                "price": price,
+                "quantity": quantity,
+                "item": item,
+            }
+        return {}
 
-    def get_list() -> str:
+    def get_list(withTime: bool = False) -> str:
         total = 0
         outgoing_text_message = ""
         for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
-            time = f"{item.date.day}/{item.date.month}/{item.date.year} {item.date.hour%12 if item.date.hour%12 != 0 else 12}:{item.date.minute} {'AM' if item.date.hour < 12 else 'PM'}"
-            outgoing_text_message += f"{i+1}. `{time}` {item.item} {str(item.quantity)+'x' if item.quantity != 1 else ''}{item.price} = {item.quantity * item.price}\n"
+            time = f"`{item.date.day}/{item.date.month}/{item.date.year} {item.date.hour%12 if item.date.hour%12 != 0 else 12}:{item.date.minute} {'AM' if item.date.hour < 12 else 'PM'}` " if withTime else ""
+            outgoing_text_message += f"{i+1}. {time}{item.item} {str(item.quantity)+'x' if item.quantity != 1 else ''}{item.price} = {item.quantity * item.price}\n"
             total += item.quantity * item.price
         if total:
             outgoing_text_message += f"\n*Total: {total}*"
@@ -48,8 +46,12 @@ def handle_function(message: Message):
         return outgoing_text_message
 
     if message.arguments[1] == "List" or message.arguments[1] == "list":
-        message.outgoing_text_message = "*💵 List 💵*\n"
-        message.outgoing_text_message += get_list()
+        if len(message.arguments) == 2:
+            message.outgoing_text_message = "*💵 List 💵*\n"
+            message.outgoing_text_message += get_list(False)
+        elif message.arguments[2] == "withTime":
+            message.outgoing_text_message = "*💵 List 💵*\n"
+            message.outgoing_text_message += get_list(True)
         message.send_message()
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
@@ -57,6 +59,7 @@ def handle_function(message: Message):
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
 - `List`: Get list of items
+- 'List withTime': Get list of items with time
 - `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
 - `Clear`: Clear all items from list
 - `Clear [item#1] [item#2] ...`: Clear specific item from list
@@ -111,5 +114,5 @@ _Note: Only the person who added the item can clear it._"""
 
         if message.outgoing_text_message:
             message.outgoing_text_message += "\n*💵 List 💵*\n"
-            message.outgoing_text_message += get_list()
+            message.outgoing_text_message += get_list(False)
             message.send_message()
