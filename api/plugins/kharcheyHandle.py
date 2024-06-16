@@ -16,6 +16,21 @@ def preprocess(message: Message) -> None:
     if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)):
         message.incoming_text_message = "./kharchey " + message.incoming_text_message
 
+def parse_item(text: str) -> dict[str, str]:
+    if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", text):
+        price = int(match.group(1))
+        quantity = int(match.group(2)) if match.group(2) else 1
+        item = match.group(3)
+
+        if match.group(2):
+            price, quantity = quantity, price
+
+        return {
+            "price": price,
+            "quantity": quantity,
+            "item": item,
+        }
+    return {}
 
 def handle_function(message: Message):
 
@@ -39,15 +54,30 @@ def handle_function(message: Message):
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
         message.outgoing_text_message = """*💵 Help 💵*
-- `List`: Get list of items
-- `Clear`: Clear all items from list
-- `Clear [item#1] [item#2] ...`: Clear specific item from list
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
+- `List`: Get list of items
+- `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
+- `Clear`: Clear all items from list
+- `Clear [item#1] [item#2] ...`: Clear specific item from list
 - `Help`: Show this message
 
 _Note: Only the person who added the item can clear it._"""
         message.send_message()
+
+    elif message.arguments[1] == "Edit" or message.arguments[1] == "edit":
+        if len(message.arguments) > 4:
+            item_no = int(message.arguments[2])
+            item = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")[item_no - 1]
+            if item:
+                if parsed := parse_item(" ".join(message.arguments[3:])):
+                    item.item = parsed["item"]
+                    item.quantity = parsed["quantity"]
+                    item.price = parsed["price"]
+                    item.save()
+                    message.outgoing_text_message = f"Item {item_no} updated\n"
+                else:
+                    message.outgoing_text_message = f"Item {item_no} not updated\n"
 
     elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
         if len(message.arguments) > 2:
@@ -68,31 +98,16 @@ _Note: Only the person who added the item can clear it._"""
 
     else:
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
-
         for message_item in message_items:
-            if match := re.match(r"(\d+)(?:x(\d+))?\s+(.+)", message_item):
-                price = int(match.group(1))
-                quantity = int(match.group(2)) if match.group(2) else 1
-                item = match.group(3)
-
-                if match.group(2):
-                    price, quantity = quantity, price
-
-                instance = {
-                    "price": price,
-                    "quantity": quantity,
-                    "item": item,
-                }
-
+            if parsed := parse_item(message_item):
                 Kharchey.objects.create(
-                    item=instance["item"],
-                    quantity=instance["quantity"],
-                    price=instance["price"],
+                    item=parsed["item"],
+                    quantity=parsed["quantity"],
+                    price=parsed["price"],
                     group=message.group,
                     sender=message.sender,
                 ).save()
-
-                message.outgoing_text_message += f"Added *{instance['item']}* to list\n"
+                message.outgoing_text_message += f"Added *{parsed['item']}* to list\n"
 
         if message.outgoing_text_message:
             message.outgoing_text_message += "\n*💵 List 💵*\n"

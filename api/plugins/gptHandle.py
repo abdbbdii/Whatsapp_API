@@ -46,7 +46,10 @@ def gptResponse(prompt: str, model: str, previous_messages: list[dict[str, str]]
                 "content": "You are a whatsapp bot. You are assisting a user in a chat. If they need help or ask a question that you can't answer, tell them to contact owner. Number: +92 312 4996133, Name: abd.",
             },
             *previous_messages,
-            {"role": "user", "content": prompt},
+            {
+                "role": "user",
+                "content": prompt,
+            },
         ],
     )
     return response.choices[0].message.content
