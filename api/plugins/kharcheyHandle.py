@@ -42,16 +42,15 @@ def handle_function(message: Message):
         if total:
             outgoing_text_message += f"\n*Total: {total}*"
         else:
-            outgoing_text_message = "List is empty"
+            outgoing_text_message = ""
         return outgoing_text_message
 
     if message.arguments[1] == "List" or message.arguments[1] == "list":
-        if len(message.arguments) == 2:
-            message.outgoing_text_message = "*💵 List 💵*\n"
-            message.outgoing_text_message += get_list(False)
-        elif message.arguments[2] == "withtime":
-            message.outgoing_text_message = "*💵 List 💵*\n"
-            message.outgoing_text_message += get_list(True)
+        message.outgoing_text_message = "*💵 List 💵*\n"
+        if lis := get_list(len(message.arguments) == 3 and message.arguments[2] == "withtime"):
+            message.outgoing_text_message += lis
+        else:
+            message.outgoing_text_message = "No items in list"
         message.send_message()
 
     elif message.arguments[1] == "Help" or message.arguments[1] == "help":
@@ -71,8 +70,7 @@ _Note: Only the person who added the item can clear it._"""
     elif message.arguments[1] == "Edit" or message.arguments[1] == "edit":
         if len(message.arguments) > 4:
             item_no = int(message.arguments[2])
-            item = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")[item_no - 1]
-            if item:
+            if item := Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")[item_no - 1]:
                 if parsed := parse_item(" ".join(message.arguments[3:])):
                     item.item = parsed["item"]
                     item.quantity = parsed["quantity"]
@@ -84,13 +82,12 @@ _Note: Only the person who added the item can clear it._"""
 
     elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
         if len(message.arguments) > 2:
-            message.outgoing_text_message = ""
             items_in_list = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
             for item_no in message.arguments[2:]:
                 if item_no.isdigit() and int(item_no) <= len(items_in_list):
                     item = items_in_list[int(item_no) - 1]
                     item.delete()
-                    message.outgoing_text_message += f"Item {item_no} ({item.item}) cleared\n"
+                    message.outgoing_text_message += f"Item {item_no}. *{item.item}* cleared\n"
                 else:
                     message.outgoing_text_message += f"Item {item_no} not found\n"
         else:
