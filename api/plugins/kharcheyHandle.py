@@ -79,6 +79,11 @@ _Note: Only the person who added the item can clear it._"""
                     message.outgoing_text_message = f"Item {item_no} updated\n"
                 else:
                     message.outgoing_text_message = f"Item {item_no} not updated\n"
+            else:
+                message.outgoing_text_message = f"Item {item_no} not found\n"
+        else:
+            message.outgoing_text_message = "Usage: `Edit [item#] [quantity]x[price] [item]`"
+        message.send_message()
 
     elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
         if len(message.arguments) > 2:
@@ -96,11 +101,12 @@ _Note: Only the person who added the item can clear it._"""
 
         message.send_message()
 
-    else:
+    elif parse_item(message.incoming_text_message.lstrip("kharchey").strip().split("\n")[0]):
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
         for message_item in message_items:
             if parsed := parse_item(message_item):
-                items = []
+                success = []
+                failed = []
                 Kharchey.objects.create(
                     item=parsed["item"],
                     quantity=parsed["quantity"],
@@ -108,11 +114,16 @@ _Note: Only the person who added the item can clear it._"""
                     group=message.group,
                     sender=message.sender,
                 ).save()
-                items.append(parsed["item"])
-                
-        if items:
-            message.outgoing_text_message += f"Added *{', '.join(items)}* to list\n"
+                success.append(parsed["item"])
+            else:
+                failed.append(message_item)
+        if success:
+            message.outgoing_text_message += f"Added *{', '.join(success)}* to list\n"
+        if failed:
+            message.outgoing_text_message += f"Failed to add *{', '.join(failed)}* to list\n"
+            message.outgoing_text_message += "Usage: `[quantity]x[price] [item]`"
         if message.outgoing_text_message:
             message.outgoing_text_message += "\n*💵 List 💵*\n"
-            message.outgoing_text_message += get_list(False)
+            lis = get_list(False)
+            message.outgoing_text_message += lis if lis else "No items in list"
             message.send_message()
