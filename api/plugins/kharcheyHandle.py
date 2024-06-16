@@ -45,7 +45,7 @@ def handle_function(message: Message):
             outgoing_text_message = ""
         return outgoing_text_message
 
-    if message.arguments[1] == "List" or message.arguments[1] == "list":
+    if message.arguments[1].casefold() == "List".casefold():
         message.outgoing_text_message = "*💵 List 💵*\n"
         if lis := get_list(len(message.arguments) == 3 and message.arguments[2] == "withtime"):
             message.outgoing_text_message += lis
@@ -53,21 +53,22 @@ def handle_function(message: Message):
             message.outgoing_text_message = "No items in list"
         message.send_message()
 
-    elif message.arguments[1] == "Help" or message.arguments[1] == "help":
+    elif message.arguments[1].casefold() == "Help".casefold():
         message.outgoing_text_message = """*💵 Help 💵*
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
 - `List`: Get list of items
 - `List withtime`: Get list of items with time
 - `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
+- `Edit [item#] [price] [item]`: Edit specific item in list
 - `Clear`: Clear all items from list
-- `Clear [item1#] [item2#] ...`: Clear specific item from list
+- `Clear [item1#] [item2#] ...`: Clear specific items from list
 - `Help`: Show this message
 
 _Note: Only the person who added the item can clear it._"""
         message.send_message()
 
-    elif message.arguments[1] == "Edit" or message.arguments[1] == "edit":
+    elif message.arguments[1].casefold() == "Edit".casefold():
         if len(message.arguments) > 4 and message.arguments[2].isdigit():
             item_no = int(message.arguments[2])
             items = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
@@ -87,7 +88,7 @@ _Note: Only the person who added the item can clear it._"""
             message.outgoing_text_message = "Usage: `Edit [item#] [quantity]x[price] [item]` or `Edit [item#] [price] [item]`"
         message.send_message()
 
-    elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
+    elif message.arguments[1].casefold() == "Clear".casefold():
         if len(message.arguments) > 2:
             items_in_list = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
             for item_no in message.arguments[2:]:
