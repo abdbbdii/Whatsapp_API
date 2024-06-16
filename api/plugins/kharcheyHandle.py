@@ -100,6 +100,7 @@ _Note: Only the person who added the item can clear it._"""
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
         for message_item in message_items:
             if parsed := parse_item(message_item):
+                items = []
                 Kharchey.objects.create(
                     item=parsed["item"],
                     quantity=parsed["quantity"],
@@ -107,8 +108,10 @@ _Note: Only the person who added the item can clear it._"""
                     group=message.group,
                     sender=message.sender,
                 ).save()
-                message.outgoing_text_message += f"Added *{parsed['item']}* to list\n"
-
+                items.append(parsed["item"])
+                
+        if items:
+            message.outgoing_text_message += f"Added *{', '.join(items)}* to list\n"
         if message.outgoing_text_message:
             message.outgoing_text_message += "\n*💵 List 💵*\n"
             message.outgoing_text_message += get_list(False)
