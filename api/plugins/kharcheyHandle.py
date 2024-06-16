@@ -61,16 +61,18 @@ def handle_function(message: Message):
 - `List withtime`: Get list of items with time
 - `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
 - `Clear`: Clear all items from list
-- `Clear [item#1] [item#2] ...`: Clear specific item from list
+- `Clear [item1#] [item2#] ...`: Clear specific item from list
 - `Help`: Show this message
 
 _Note: Only the person who added the item can clear it._"""
         message.send_message()
 
     elif message.arguments[1] == "Edit" or message.arguments[1] == "edit":
-        if len(message.arguments) > 4:
+        if len(message.arguments) > 4 and message.arguments[2].isdigit():
             item_no = int(message.arguments[2])
-            if item := Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")[item_no - 1]:
+            items = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")
+            if item_no <= len(items):
+                item = items[item_no - 1]
                 if parsed := parse_item(" ".join(message.arguments[3:])):
                     item.item = parsed["item"]
                     item.quantity = parsed["quantity"]
@@ -82,7 +84,7 @@ _Note: Only the person who added the item can clear it._"""
             else:
                 message.outgoing_text_message = f"Item {item_no} not found\n"
         else:
-            message.outgoing_text_message = "Usage: `Edit [item#] [quantity]x[price] [item]`"
+            message.outgoing_text_message = "Usage: `Edit [item#] [quantity]x[price] [item]` or `Edit [item#] [price] [item]`"
         message.send_message()
 
     elif message.arguments[1] == "Clear" or message.arguments[1] == "clear":
@@ -99,7 +101,7 @@ _Note: Only the person who added the item can clear it._"""
             Kharchey.objects.filter(group=message.group, sender=message.sender).delete()
             message.outgoing_text_message = "All items cleared"
         else:
-            message.outgoing_text_message = "Usage: `Clear [item#1] [item#2] ...`"
+            message.outgoing_text_message = "Usage: `Clear [item1#] [item2#] ...`"
         message.send_message()
 
     elif parse_item(message.incoming_text_message.lstrip("kharchey").strip().split("\n")[0]):
