@@ -37,7 +37,7 @@ def handle_function(message: Message):
         outgoing_text_message = ""
         for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
             time = f"`{item.date.day}/{item.date.month}/{item.date.year} {item.date.hour%12 if item.date.hour%12 != 0 else 12}:{item.date.minute} {'AM' if item.date.hour < 12 else 'PM'}` " if withtime else ""
-            outgoing_text_message += f"{i+1}. {time}{item.item} {str(item.quantity)+'x' if item.quantity != 1 else ''}{item.price} = {item.quantity * item.price}\n"
+            outgoing_text_message += f"{i+1}. {time+item.item} {str(item.quantity)+'x' if item.quantity != 1 else ''}{item.price} = {item.quantity * item.price}\n"
             total += item.quantity * item.price
         if total:
             outgoing_text_message += f"\n*Total: {total}*"
@@ -76,9 +76,9 @@ _Note: Only the person who added the item can clear it._"""
                     item.quantity = parsed["quantity"]
                     item.price = parsed["price"]
                     item.save()
-                    message.outgoing_text_message = f"Item {item_no} updated\n"
+                    message.outgoing_text_message = f"Item {item_no}. *{item.item}* updated\n"
                 else:
-                    message.outgoing_text_message = f"Item {item_no} not updated\n"
+                    message.outgoing_text_message = f"Item {item_no}. *{item.item}* not updated\n"
             else:
                 message.outgoing_text_message = f"Item {item_no} not found\n"
         else:
@@ -95,10 +95,11 @@ _Note: Only the person who added the item can clear it._"""
                     message.outgoing_text_message += f"Item {item_no}. *{item.item}* cleared\n"
                 else:
                     message.outgoing_text_message += f"Item {item_no} not found\n"
-        else:
+        elif len(message.arguments) == 2:
             Kharchey.objects.filter(group=message.group, sender=message.sender).delete()
             message.outgoing_text_message = "All items cleared"
-
+        else:
+            message.outgoing_text_message = "Usage: `Clear [item#1] [item#2] ...`"
         message.send_message()
 
     elif parse_item(message.incoming_text_message.lstrip("kharchey").strip().split("\n")[0]):
