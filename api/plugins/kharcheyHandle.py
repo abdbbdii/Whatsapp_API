@@ -59,7 +59,7 @@ def handle_function(message: Message):
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
 - `List`: Get list of items
-- 'List withtime': Get list of items with time
+- `List withtime`: Get list of items with time
 - `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
 - `Clear`: Clear all items from list
 - `Clear [item#1] [item#2] ...`: Clear specific item from list
