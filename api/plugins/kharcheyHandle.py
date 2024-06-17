@@ -107,10 +107,10 @@ _Note: Only the person who added the item can clear it._"""
 
     elif parse_item(message.incoming_text_message.lstrip("kharchey").strip().split("\n")[0]):
         message_items = message.incoming_text_message.lstrip("kharchey").strip().split("\n")
+        success = []
+        failed = []
         for message_item in message_items:
             if parsed := parse_item(message_item):
-                success = []
-                failed = []
                 Kharchey.objects.create(
                     item=parsed["item"],
                     quantity=parsed["quantity"],
