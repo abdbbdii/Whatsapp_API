@@ -31,13 +31,15 @@ def classroom(request):
 def reminder(request):
     if request.method == "POST":
         print("POST /api/reminder")
-        API(
-            {
-                "document": json.loads(request.body.decode("utf-8")),
-                "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
-                "message": {"text": "./reminder"},
-            }
-        )
+        if json.loads(json.loads(request.body.decode("utf-8"))["notes"])["from"] == "classroom":
+            API(
+                {
+                    "document": json.loads(request.body.decode("utf-8")),
+                    "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
+                    "message": {"text": "./reminder"},
+                }
+            )
+
         return JsonResponse({"statusCode": 200, "message": "Reminder sent successfully."})
     else:
         return JsonResponse({"message": "Authorization required."})

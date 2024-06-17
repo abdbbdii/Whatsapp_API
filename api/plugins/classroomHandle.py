@@ -1,9 +1,10 @@
-from api.whatsapp_api_handle import Message
-from api.utils.download_gdrive import download_gdrive_file
-from api.utils.reminders_api import ReminderAPI
-from datetime import datetime, timedelta
-from api.appSettings import appSettings
 import json
+from datetime import datetime, timedelta
+
+from api.whatsapp_api_handle import Message
+from api.utils.reminders_api import ReminderAPI
+from api.utils.download_gdrive import download_gdrive_file
+from api.appSettings import appSettings
 
 pluginInfo = {
     "command_name": "classroom",
@@ -34,18 +35,14 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
         return
     if not time:
         time = {"hours": 23, "minutes": 59}
-
     reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "api/reminder", ("admin", "admin"))
-
     if appSettings.reminders_api_classroom_id and reminders_api.get_application(appSettings.reminders_api_classroom_id).json().get("message") != "Item not found.":
         application_id = appSettings.reminders_api_classroom_id
     else:
         application_id = reminders_api.find_application_id(appSettings.reminders_api_classroom_name)
         if not application_id:
             application_id = reminders_api.create_application(appSettings.reminders_api_classroom_name, "10:00").json().get("id")
-
         appSettings.update("reminders_api_classroom_id", application_id)
-
     reminders = [60, 30, 10, 0]
     for reminder in reminders:
         date_tz, time_tz = subtract_minutes(date, time, reminder)
@@ -55,7 +52,7 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
             timezone="Asia/Karachi",
             date_tz=f'{date_tz["year"]}-{date_tz["month"]:02d}-{date_tz["day"]:02d}',
             time_tz=f'{time_tz["hours"]:02d}:{time_tz["minutes"]:02d}',
-            notes=json.dumps({"time_remaining": reminder, "link": link}),
+            notes=json.dumps({"time_remaining": reminder, "link": link, "from": "classroom"}),
             rrule=None,
             webhook_url=appSettings.public_url + "api/reminder",
         )
@@ -112,10 +109,15 @@ def handle_function(message: Message):
             },
         )
         message.document["content"]["activity"]["title"] = "Announcement"
-
     message.send_message()
-    set_reminder(message.document["content"]["activity"].get("dueDate"), message.document["content"]["activity"].get("dueTime"), message.document["content"]["activity"]["title"], message.document["content"]["activity"]["alternateLink"])
 
+    if message.document["content"]["activity"].get("dueDate"):
+        set_reminder(
+            message.document["content"]["activity"].get("dueDate"),
+            message.document["content"]["activity"].get("dueTime"),
+            message.document["content"]["activity"]["title"],
+            message.document["content"]["activity"]["alternateLink"],
+        )
     materials = message.document["content"]["activity"].get("materials")
 
     if not materials:

@@ -36,6 +36,7 @@ class AppSettings:
         self.ocr_space_api_key = settings.ocr_space_api_key
         self.openai_api_key = settings.openai_api_key
         self.kharchey_group_id = settings.kharchey_group_id
+        self.reminders_api_remind_id = settings.reminders_api_remind_id
 
     def __str__(self) -> str:
         return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
@@ -89,6 +90,7 @@ class AppSettings:
 
 try:
     appSettings = AppSettings()
+    
 except ProgrammingError:
 
     class AppSettings:
@@ -106,5 +108,6 @@ except ProgrammingError:
             self.ocr_space_api_key = ""
             self.openai_api_key = ""
             self.kharchey_group_id = ""
+            self.reminders_api_remind_id = ""
 
     appSettings = AppSettings()

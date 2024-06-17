@@ -22,6 +22,7 @@ class Settings(models.Model):
     ocr_space_api_key = models.TextField(default="", null=True)
     openai_api_key = models.TextField(default="", null=True)
     kharchey_group_id = models.TextField(default="", null=True)
+    reminders_api_remind_id = models.TextField(default="", null=True)
 
 
 class Kharchey(models.Model):
