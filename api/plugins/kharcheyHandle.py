@@ -32,10 +32,11 @@ def handle_function(message: Message):
             }
         return {}
 
-    def get_list(withtime: bool = False) -> str:
+    def get_list(withtime: bool = False, all=False) -> str:
         total = 0
         outgoing_text_message = ""
-        for i, item in enumerate(Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date")):
+        items = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date") if not all else Kharchey.objects.filter(group=message.group).order_by("date")
+        for i, item in enumerate(items):
             time = f"`{item.date.day:02d}/{item.date.month:02d}/{item.date.year:04d} {((item.date.hour - 12) if item.date.hour > 12 else item.date.hour):02d}:{item.date.minute:02d} {"PM" if item.date.hour > 12 else "AM"}` " if withtime else ""
             outgoing_text_message += f"{i+1}. {time+item.item} for Rs. *{str(item.quantity)+'x'+str(item.price)+'='+str(item.quantity*item.price) if item.quantity > 1 else str(item.price)}*\n"
             total += item.quantity * item.price
@@ -45,20 +46,13 @@ def handle_function(message: Message):
             outgoing_text_message = ""
         return outgoing_text_message
 
-    if message.arguments[1].casefold() == "List".casefold():
-        message.outgoing_text_message = "*💵 List 💵*\n"
-        if lis := get_list(len(message.arguments) == 3 and message.arguments[2] == "withtime"):
-            message.outgoing_text_message += lis
-        else:
-            message.outgoing_text_message = "No items in list"
-        message.send_message()
-
-    elif message.arguments[1].casefold() == "Help".casefold():
+    if message.arguments[1].casefold() == "Help".casefold():
         message.outgoing_text_message = """*💵 Help 💵*
 - `[quantity]x[price] [item]`: Add items with quantity
 - `[price] [item]`: Add items without quantity
 - `List`: Get list of items
 - `List withtime`: Get list of items with time
+- `List all`: Get list of all participants
 - `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
 - `Edit [item#] [price] [item]`: Edit specific item in list
 - `Clear`: Clear all items from list
@@ -66,6 +60,16 @@ def handle_function(message: Message):
 - `Help`: Show this message
 
 _Note: Only the person who added the item can clear it._"""
+        message.send_message()
+
+    elif message.arguments[1].casefold() == "List".casefold():
+        message.outgoing_text_message = "*💵 List 💵*\n"
+        if lis := get_list(len(message.arguments) == 3 and message.arguments[2] == "withtime"):
+            message.outgoing_text_message += lis
+        elif lis := get_list(len(message.arguments) == 3 and message.arguments[2] == "all", all=True):
+            message.outgoing_text_message += lis
+        else:
+            message.outgoing_text_message = "No items in list"
         message.send_message()
 
     elif message.arguments[1].casefold() == "Edit".casefold():
