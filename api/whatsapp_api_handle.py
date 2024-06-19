@@ -73,12 +73,13 @@ class Message:
         self.command_prefix = "./" if self.group else "/"
         self.arguments: Optional[List[Union[str, int, float]]] = None
         self.admin_privilege: bool = False
-        self.incoming_message_id: Optional[str] = data["message"]["id"]
+        self.incoming_message_id: Optional[str] = data["message"].get("id")
         self.incoming_text_message: Optional[str] = ""
         self.outgoing_text_message: Optional[str] = ""
         self.link: Optional[str] = None
         self.send_to: List[str] = [self.senderId if self.groupId is None else self.groupId]
         self.document: Optional[Any] = data.get("document")
+        self.document_type: Optional[str] = data.get("document_type")
         self.media_mime_type: Optional[str] = None
         self.media_type: Optional[bytes] = None
         self.media_path: Optional[str] = None
@@ -115,7 +116,7 @@ class Message:
                     self.arguments = ["help"]
 
     def set_incoming_text_message(self, data: dict) -> None:
-        for media_type in ["image", "video", "audio", "document", "sticker"]:
+        for media_type in ["image", "video", "audio", "file", "sticker"]:
             if data.get(media_type):
                 self.incoming_text_message = data[media_type]["caption"].replace("\xa0", " ")
                 self.media_type = media_type

@@ -43,16 +43,17 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
         if not application_id:
             application_id = reminders_api.create_application(appSettings.reminders_api_classroom_name, "10:00").json().get("id")
         appSettings.update("reminders_api_classroom_id", application_id)
-    reminders = [60, 30, 10, 0]
-    for reminder in reminders:
-        date_tz, time_tz = subtract_minutes(date, time, reminder)
+        
+    time_intervals = [60, 30, 10, 0]
+    for time_interval in time_intervals:
+        date_tz, time_tz = subtract_minutes(date, time, time_interval)
         response = reminders_api.create_reminder(
             application_id=application_id,
             title=title,
             timezone="Asia/Karachi",
             date_tz=f'{date_tz["year"]}-{date_tz["month"]:02d}-{date_tz["day"]:02d}',
             time_tz=f'{time_tz["hours"]:02d}:{time_tz["minutes"]:02d}',
-            notes=json.dumps({"time_remaining": reminder, "link": link, "from": "classroom", "sender": appSettings.classroom_group_id}),
+            notes=json.dumps({"time_remaining": time_interval, "link": link, "sender": appSettings.classroom_group_id}),
             rrule=None,
             webhook_url=appSettings.public_url + "api/reminder",
         )
@@ -69,6 +70,21 @@ def make_message(header, items, footer=""):
 
 
 def handle_function(message: Message):
+    if message.document_type == "reminder_api":
+        notes = json.loads(message.document["notes"])
+        match notes["time_remaining"]:
+            case 0:
+                message.outgoing_text_message = f'*⌛ Time\'s up for {message.document["title"]} ⌛*'
+            case 10:
+                message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*\n\nYou should start submitting your work now.\n{notes["link"]}'
+            case _:
+                message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
+        message.send_message()
+        return
+
+    elif message.document_type != "google_classroom_api":
+        return
+
     if message.document["content"]["type"] == "material":
         message.outgoing_text_message = make_message(
             header=f'New Material for {message.document["content"]["course"]["descriptionHeading"]}',

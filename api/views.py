@@ -19,6 +19,7 @@ def classroom(request):
         API(
             {
                 "document": json.loads(request.body.decode("utf-8")),
+                "document_type": "google_classroom_api",
                 "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
                 "message": {"text": "./classroom"},
             }
@@ -31,14 +32,29 @@ def classroom(request):
 def reminder(request):
     if request.method == "POST":
         print("POST /api/reminder")
-        if json.loads(json.loads(request.body.decode("utf-8"))["notes"])["from"] == "classroom":
-            API(
-                {
-                    "document": json.loads(request.body.decode("utf-8")),
-                    "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
-                    "message": {"text": "./reminder"},
-                }
-            )
+        body = json.loads(request.body.decode("utf-8"))
+
+        for reminder in body["reminders_notified"]:
+            notes = json.loads(reminder["notes"])
+            match str(reminder["application_id"]):
+                case appSettings.reminders_api_classroom_id:
+                    API(
+                        {
+                            "document": reminder,
+                            "document_type": "reminder_api",
+                            "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {notes["sender"]}@g.us",
+                            "message": {"text": "./classroom"},
+                        }
+                    )
+                case appSettings.reminders_api_remind_id:
+                    API(
+                        {
+                            "document": reminder,
+                            "document_type": "reminder_api",
+                            "from": f"{notes["sender"]}@s.whatsapp.net",
+                            "message": {"text": "/remind"},
+                        }
+                    )
 
         return JsonResponse({"statusCode": 200, "message": "Reminder sent successfully."})
     else:
