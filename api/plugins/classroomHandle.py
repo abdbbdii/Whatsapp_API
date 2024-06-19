@@ -52,7 +52,7 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
             timezone="Asia/Karachi",
             date_tz=f'{date_tz["year"]}-{date_tz["month"]:02d}-{date_tz["day"]:02d}',
             time_tz=f'{time_tz["hours"]:02d}:{time_tz["minutes"]:02d}',
-            notes=json.dumps({"time_remaining": reminder, "link": link, "from": "classroom"}),
+            notes=json.dumps({"time_remaining": reminder, "link": link, "from": "classroom", "sender": appSettings.classroom_group_id}),
             rrule=None,
             webhook_url=appSettings.public_url + "api/reminder",
         )
