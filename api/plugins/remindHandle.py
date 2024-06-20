@@ -73,13 +73,19 @@ def get_reminders(message: Message, reminders_api: ReminderAPI):
 
 
 def delete_reminder(message: Message, reminders_api: ReminderAPI):
+    success = []
+    failure = []
     for reminder_id in message.arguments[2:]:
         response = reminders_api.delete_reminder(reminder_id)
         print(response.text)
         if error := json.loads(response.text).get("errors"):
-            message.outgoing_text_message += f"Error: {error}"
+            failure.append((reminder_id, error))
         else:
-            message.outgoing_text_message += "Reminder deleted successfully."
+            success.append(reminder_id)
+    if success:
+        message.outgoing_text_message = f"Successfully deleted reminders: {', '.join(success)}"
+    if failure:
+        message.outgoing_text_message += f"\nFailed to delete reminders: {', '.join([f'{reminder_id}: {error}' for reminder_id, error in failure])}"
     if message.outgoing_text_message:
         message.send_message()
     else:
