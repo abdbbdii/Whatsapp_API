@@ -27,17 +27,9 @@ def get_timezone_from_number(phone_number: str, country_code_to_timezone: dict) 
 
 def create_reminder(message: Message, reminders_api: ReminderAPI):
     if timezone := get_timezone_from_number("+" + message.sender, json.load(open("api/assets/timezones.json"))):
-        if appSettings.reminders_api_remind_id and reminders_api.get_application(appSettings.reminders_api_remind_id).json().get("remind") != "Item not found.":
-            application_id = appSettings.reminders_api_remind_id
-        else:
-            application_id = reminders_api.find_application_id("remind")
-            if not application_id:
-                application_id = reminders_api.create_application("remind", "10:00").json().get("id")
-            appSettings.update("reminders_api_remind_id", application_id)
-
         parsed = craete_parser(message.arguments[2:])
         response = reminders_api.create_reminder(
-            application_id=application_id,
+            application_id=appSettings.reminders_api_remind_id,
             title=" ".join(parsed.message),
             timezone=timezone,
             date_tz=parsed.date,
@@ -95,8 +87,8 @@ def delete_reminder(message: Message, reminders_api: ReminderAPI):
 def get_help(message: Message):
     pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
     message.outgoing_text_message = f"""*Usage:*
-- Reminder: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
-- Reminder with recurrence rule: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
+- Create reminder: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
+- Create reminder with recurrence rule: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
 - Get reminders: `{pretext} get`
 - Delete reminder: `{pretext} delete [reminder_id1] [reminder_id2] ...`"""
     message.send_message()

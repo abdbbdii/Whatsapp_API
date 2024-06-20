@@ -43,7 +43,7 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
         if not application_id:
             application_id = reminders_api.create_application(appSettings.reminders_api_classroom_name, "10:00").json().get("id")
         appSettings.update("reminders_api_classroom_id", application_id)
-        
+
     time_intervals = [60, 30, 10, 0]
     for time_interval in time_intervals:
         date_tz, time_tz = subtract_minutes(date, time, time_interval)
@@ -75,6 +75,8 @@ def handle_function(message: Message):
         match notes["time_remaining"]:
             case 0:
                 message.outgoing_text_message = f'*⌛ Time\'s up for {message.document["title"]} ⌛*'
+                reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "api/reminder", ("admin", "admin"))
+                print(reminders_api.delete_reminder(message.document["id"]).json())
             case 10:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*\n\nYou should start submitting your work now.\n{notes["link"]}'
             case _:
