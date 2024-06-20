@@ -36,6 +36,7 @@ def reminder(request):
 
         for reminder in body["reminders_notified"]:
             notes = json.loads(reminder["notes"])
+            print(reminder["application_id"], appSettings.reminders_api_remind_id)
             match str(reminder["application_id"]):
                 case appSettings.reminders_api_classroom_id:
                     API(

@@ -151,4 +151,7 @@ if __name__ == "__main__":
     # print(reminder_api.create_reminder("876", "Google_Classroom_API", "Asia/Karachi", "2024-05-29", "21:37", "FREQ=MINUTELY;INTERVAL=3", webhook_url="https://google-classroom-api.vercel.app/api/notify_new_activity").text)  # 16431
 
     # reminder_api.delete_reminders_for_application("876")
-    # print(reminder_api.get_reminders_for_application("873").json())
+    # print(reminder_api.delete_application("895").text)
+    # print(reminder_api.get_application("900").json())
+    # print(reminder_api.find_application_id("remind"))
+    # print(reminder_api.get_reminders_for_application("895").json())
