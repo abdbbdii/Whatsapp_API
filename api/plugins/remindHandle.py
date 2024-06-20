@@ -38,8 +38,8 @@ def handle_function(message: Message):
     except SystemExit:
         pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
         message.outgoing_text_message = f"""*Usage:*
-- `Reminder: {pretext} -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
-- `Reminder with recurrence rule: {pretext} -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
+- Reminder: `{pretext} -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
+- Reminder with recurrence rule: `{pretext} -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
 """
         message.send_message()
         return
