@@ -58,7 +58,7 @@ def create_reminder(message: Message, reminders_api: ReminderAPI):
 
 
 def get_reminders(message: Message, reminders_api: ReminderAPI):
-    response = reminders_api.get_reminders(appSettings.reminders_api_remind_id)
+    response = reminders_api.get_reminders_for_application(appSettings.reminders_api_remind_id)
     print(response.text)
     if error := json.loads(response.text).get("errors"):
         message.outgoing_text_message = f"Error: {error}"
