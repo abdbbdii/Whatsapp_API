@@ -3,9 +3,9 @@ from argparse import ArgumentParser
 
 import phonenumbers
 
-from api.utils.reminders_api import ReminderAPI
-from api.whatsapp_api_handle import Message
 from api.appSettings import appSettings
+from api.whatsapp_api_handle import Message
+from api.utils.reminders_api import ReminderAPI
 
 pluginInfo = {
     "command_name": "remind",
