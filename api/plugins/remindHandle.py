@@ -58,6 +58,8 @@ def create_reminder(message: Message, reminders_api: ReminderAPI):
 
 
 def get_reminders(message: Message, reminders_api: ReminderAPI):
+    if len(message.arguments) > 2:
+        raise SystemExit
     response = reminders_api.get_reminders_for_application(appSettings.reminders_api_remind_id)
     print(response.text)
     if error := json.loads(response.text).get("errors"):
@@ -71,13 +73,17 @@ def get_reminders(message: Message, reminders_api: ReminderAPI):
 
 
 def delete_reminder(message: Message, reminders_api: ReminderAPI):
-    response = reminders_api.delete_reminder(message.arguments[2])
-    print(response.text)
-    if error := json.loads(response.text).get("errors"):
-        message.outgoing_text_message = f"Error: {error}"
+    for reminder_id in message.arguments[2:]:
+        response = reminders_api.delete_reminder(reminder_id)
+        print(response.text)
+        if error := json.loads(response.text).get("errors"):
+            message.outgoing_text_message += f"Error: {error}"
+        else:
+            message.outgoing_text_message += "Reminder deleted successfully."
+    if message.outgoing_text_message:
+        message.send_message()
     else:
-        message.outgoing_text_message = "Reminder deleted successfully."
-    message.send_message()
+        raise SystemExit
 
 
 def get_help(message: Message):
@@ -86,7 +92,7 @@ def get_help(message: Message):
 - Reminder: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
 - Reminder with recurrence rule: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
 - Get reminders: `{pretext} get`
-- Delete reminder: `{pretext} delete [reminder_id]`"""
+- Delete reminder: `{pretext} delete [reminder_id1] [reminder_id2] ...`"""
     message.send_message()
 
 
