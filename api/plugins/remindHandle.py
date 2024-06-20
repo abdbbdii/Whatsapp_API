@@ -26,10 +26,8 @@ def get_timezone_from_number(phone_number: str, country_code_to_timezone: dict) 
 
 
 def handle_function(message: Message):
-    print(message.document_type)
     if message.document_type == "reminder_api":
         message.outgoing_text_message = f"Reminder: {message.document['title']}"
-        print(message.sender)
         message.send_message()
         return
     try:
