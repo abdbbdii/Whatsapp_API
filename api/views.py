@@ -6,7 +6,6 @@ from .appSettings import appSettings
 def whatsapp(request):
     if request.method == "POST":
         print("POST /api/whatsapp")
-        # print(json.loads(request.body.decode("utf-8")))
         API(json.loads(request.body.decode("utf-8")))
         return JsonResponse({"statusCode": 200, "message": "Message sent successfully."})
     else:
