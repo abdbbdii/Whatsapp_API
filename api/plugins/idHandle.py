@@ -7,6 +7,19 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "",
+            "description": "Find the IDs of the message, sender, and group (if applicable).",
+            "examples": [
+                "",
+            ],
+        },
+    ],
+    "note": "Find the IDs of the message, sender, and group (if applicable).",
+}
+
 
 def handle_function(message: Message):
     message.outgoing_text_message = f"""*IDs*

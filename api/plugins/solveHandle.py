@@ -10,6 +10,18 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "",
+            "description": "Solve MCQs from an image.",
+            "examples": [
+                "Attach image with caption.",
+            ],
+        },
+    ],
+    "note": "Solve MCQs from an image. If the user says 'Attachment' at the end of the message, the bot will consider the message as an attachment.",
+}
 
 def handle_function(message: Message):
     if not message.media_path:

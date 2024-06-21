@@ -9,6 +9,35 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "-a [number] [number] ...",
+            "description": "Add members to blacklist.",
+            "examples": [
+                "-a 923201234567",
+                "--add 923123098456 923201234567 923123456789",
+            ],
+        },
+        {
+            "command": "-r [number] [number] ...",
+            "description": "Remove members from blacklist.",
+            "examples": [
+                "-r 923201234567",
+                "--remove 923123098456 923201234567 923123456789",
+            ],
+        },
+        {
+            "command": "-g",
+            "description": "Get blacklist.",
+            "examples": [
+                "-g",
+                "--get",
+            ],
+        },
+    ],
+    "note": "Blacklisted members cannot use the bot.",
+}
 
 def handle_function(message: Message):
     try:

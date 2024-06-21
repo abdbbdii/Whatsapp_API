@@ -13,6 +13,28 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "[description]",
+            "description": "Generate image.",
+            "examples": [
+                "A cat with a hat.",
+                "A dog with a frog.",
+            ],
+        },
+        {
+            "command": "-m [model] [description]",
+            "description": "Generate image using a specific model.",
+            "examples": [
+                "-m dall-e-2 A cat with a hat.",
+                "-m clip A dog with a frog.",
+            ],
+        },
+    ],
+    "note": "Generate image using OpenAI's DALL-E model.",
+}
+
 
 def handle_function(message: Message):
     try:

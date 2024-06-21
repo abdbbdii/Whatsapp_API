@@ -9,6 +9,35 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "-c [setting] [value]",
+            "description": "Change setting.",
+            "examples": [
+                "-c admin_command_prefix !",
+                "--change admin_command_prefix !",
+            ],
+        },
+        {
+            "command": "-g [setting]",
+            "description": "View setting.",
+            "examples": [
+                "-g admin_command_prefix",
+                "--get admin_command_prefix",
+            ],
+        },
+        {
+            "command": "-g all",
+            "description": "View all settings.",
+            "examples": [
+                "-g all",
+                "--get all",
+            ],
+        },
+    ],
+    "note": f"Available settings:\n- {'\n- '.join(appSettings.list())}",
+}
 
 def handle_function(message: Message):
     try:

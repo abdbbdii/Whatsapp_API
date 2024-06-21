@@ -1,13 +1,20 @@
 import re
 import os
+import json
 import importlib.util
 from shlex import split
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+from datetime import datetime
 
+import pytz
 import requests
+import phonenumbers
+from openai import OpenAI
 from django.utils import timezone
-from .appSettings import appSettings
+
+from api.models import GPTResponse
+from api.appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
 
 
@@ -32,11 +39,12 @@ class MessageNotValid(Exception):
 
 
 class Plugin:
-    def __init__(self, command_name: str, admin_privilege: bool, description: str, handle_function: Any, preprocess: Any, internal: bool):
+    def __init__(self, command_name: str, admin_privilege: bool, description: str, handle_function: Any, preprocess: Optional[Any] = None, internal: bool = False, help_message: Optional[dict[str, Any]] = None) -> None:
         self.command_name = command_name
         self.admin_privilege = admin_privilege
         self.description = description
         self.handle_function = handle_function
+        self.help_message = help_message
         self.internal = internal
         self.preprocess = preprocess
 
@@ -56,6 +64,7 @@ class Plugin:
                 internal=plugin.pluginInfo["internal"],
                 handle_function=plugin.handle_function,
                 preprocess=plugin.preprocess if "preprocess" in dir(plugin) else None,
+                help_message=plugin.helpMessage if "helpMessage" in dir(plugin) else None,
             )
         return plugins
 
@@ -84,11 +93,13 @@ class Message:
         self.media_type: Optional[bytes] = None
         self.media_path: Optional[str] = None
         self.media: Optional[bytes] = None
+        self.timezone: Optional[str] = None
 
         self.set_incoming_text_message(data)
         self.validate()
         if self.media_type:
             self.set_media(data)
+        self.get_timezone()
 
     def validate(self) -> None:
         if not self.incoming_text_message and self.group:
@@ -137,6 +148,14 @@ class Message:
         else:
             sender, group = string, None
         return sender, group
+
+    def get_timezone(self) -> str | None:
+        try:
+            parsed_number = phonenumbers.parse("+" + self.sender)
+            country_code = phonenumbers.region_code_for_number(parsed_number)
+            self.timezone = json.load(open("api/assets/timezones.json")).get(country_code)
+        except phonenumbers.phonenumberutil.NumberParseException:
+            pass
 
     def send_message(self) -> None:
         for phone in self.send_to:
@@ -226,9 +245,74 @@ class API:
             if plugin.preprocess:
                 plugin.preprocess(self.message)
 
+    def get_previous_messages(self) -> list[dict[str, str]]:
+        previous_messages = []
+        for response in GPTResponse.objects.filter(group=self.message.group, sender=self.message.sender).order_by("-date")[:5]:
+            previous_messages.append({"role": "user", "content": response.message})
+            previous_messages.append({"role": "assistant", "content": response.response})
+        return previous_messages
+
+    def save_response(self, response) -> None:
+        GPTResponse.objects.create(message=self.message.incoming_text_message, response=response, group=self.message.group, sender=self.message.sender)
+
+    def get_all_help_message(self) -> str:
+        help_message = ""
+        for _, plugin in self.plugins.items():
+            if plugin.internal or not plugin.help_message:
+                continue
+            pretext = self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name
+            help_message += f"## {plugin.command_name}\n"
+            for command in plugin.help_message["commands"]:
+                help_message += f"### `{pretext} {command['command']}`\n"
+                help_message += f"- {command['description']}\n"
+                if "examples" in command:
+                    help_message += "#### Examples:\n"
+                for example in command.get("examples", []):
+                    help_message += f"  - `{pretext} {example}`\n"
+            help_message += f"\n Note: {plugin.help_message['note']}\n" if "note" in plugin.help_message else "\n"
+        help_message += "## help\n"
+        help_message += f"### `{self.message.command_prefix}help`\n"
+        help_message += "- Show supported commands.\n"
+        help_message += f"### `{self.message.command_prefix + appSettings.admin_command_prefix} help`\n"
+        help_message += "- Show supported admin commands.\n"
+        return help_message
+
+    def gptResponse(self) -> str:
+        system_content = open("api/assets/training.md").read().format(help_message=self.get_all_help_message(), timezone=self.message.timezone, time=datetime.now(pytz.timezone(self.message.timezone)).strftime("%Y-%m-%d %H:%M:%S"))
+
+        response = OpenAI(api_key=appSettings.openai_api_key).chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_content,
+                },
+                *self.get_previous_messages(),
+                {
+                    "role": "user",
+                    "content": self.message.incoming_text_message,
+                },
+            ],
+            response_format={"type": "json_object"},
+        )
+        return json.loads(response.choices[0].message.content)
+
     def message_handle(self) -> None:
-        self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
-        self.message.send_message()
+        response = self.gptResponse()
+        print(response)
+        if response.get("command"):
+            self.message.incoming_text_message = response["command"]
+            self.message.process_incoming_text_message()
+            self.command_handle()
+        if response.get("chat"):
+            self.message.incoming_text_message += "\nAttachment: " + self.message.media_path if self.message.media_path else ""
+            self.message.outgoing_text_message = response["chat"]
+            self.message.send_message()
+
+        self.save_response(f'"chat": "{response.get('chat')}", "command": {response.get('command', '')}, "backend_response": "{self.message.outgoing_text_message}"')
+
+        # self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
+        # self.message.send_message()
 
     def command_handle(self) -> None:
         if self.message.arguments[0] == appSettings.admin_command_prefix and not self.message.admin_privilege:

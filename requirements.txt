@@ -32,6 +32,7 @@ pydantic==2.7.2
 pydantic-core==2.18.3
 pyparsing==3.1.2
 python-dotenv==1.0.1
+pytz==2024.1
 requests==2.32.2
 requests-oauthlib==2.0.0
 rsa==4.9

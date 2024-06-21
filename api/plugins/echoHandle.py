@@ -10,6 +10,27 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "[message]",
+            "description": "Echo message.",
+            "examples": [
+                "Hello!",
+                "This is a test message.",
+            ],
+        },
+        {
+            "command": "",
+            "description": "Echo image with caption.",
+            "examples": [
+                "Attach image with caption.",
+            ],
+        },
+    ],
+    "note": "Echoes the message.",
+}
+
 
 def handle_function(message: Message):
     if message.media_path:

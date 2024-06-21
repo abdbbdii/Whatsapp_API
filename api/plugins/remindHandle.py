@@ -1,8 +1,6 @@
 import json
 from argparse import ArgumentParser
 
-import phonenumbers
-
 from api.appSettings import appSettings
 from api.whatsapp_api_handle import Message
 from api.utils.reminders_api import ReminderAPI
@@ -14,24 +12,48 @@ pluginInfo = {
     "internal": False,
 }
 
-
-def get_timezone_from_number(phone_number: str, country_code_to_timezone: dict) -> str | None:
-    try:
-        parsed_number = phonenumbers.parse(phone_number)
-        country_code = phonenumbers.region_code_for_number(parsed_number)
-        timezone = country_code_to_timezone.get(country_code, "Unknown timezone")
-        return timezone
-    except phonenumbers.phonenumberutil.NumberParseException:
-        return None
+helpMessage = {
+    "commands": [
+        {
+            "command": "create -d [YYYY-MM-DD] -t [HH:MM] -m [message]",
+            "description": "Set a reminder for a specific date and time.",
+            "examples": [
+                "create -d 2022-12-31 -t 23:59 -m Happy New Year!",
+            ],
+        },
+        {
+            "command": "create -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]",
+            "description": "Set a reminder for a specific date and time with recurrence rule.",
+            "examples": [
+                "create -d 2022-12-31 -t 23:59 -r FREQ=YEARLY -m Happy New Year!",
+            ],
+        },
+        {
+            "command": "get",
+            "description": "Get reminders.",
+            "examples": [
+                "get",
+            ],
+        },
+        {
+            "command": "delete [reminder_id1] [reminder_id2] ...",
+            "description": "Delete reminders.",
+            "examples": [
+                "delete 1 2",
+            ],
+        },
+    ],
+    "note": "Reminders are set based on the phone number of the sender.",
+}
 
 
 def create_reminder(message: Message, reminders_api: ReminderAPI):
-    if timezone := get_timezone_from_number("+" + message.sender, json.load(open("api/assets/timezones.json"))):
+    if message.timezone:
         parsed = craete_parser(message.arguments[2:])
         response = reminders_api.create_reminder(
             application_id=appSettings.reminders_api_remind_id,
             title=" ".join(parsed.message),
-            timezone=timezone,
+            timezone=message.timezone,
             date_tz=parsed.date,
             time_tz=parsed.time,
             notes=json.dumps({"sender": message.sender}),
@@ -70,14 +92,14 @@ def delete_reminder(message: Message, reminders_api: ReminderAPI):
     for reminder_id in message.arguments[2:]:
         response = reminders_api.delete_reminder(reminder_id)
         print(response.text)
-        if error := json.loads(response.text).get("errors"):
+        if error := json.loads(response.text).get("message") == "Item not found.":
             failure.append((reminder_id, error))
         else:
             success.append(reminder_id)
     if success:
-        message.outgoing_text_message = f"Successfully deleted reminders: {', '.join(success)}"
+        message.outgoing_text_message = f"Successfully deleted reminders: {', '.join(success)}\n"
     if failure:
-        message.outgoing_text_message += f"\nFailed to delete reminders: {', '.join([f'{reminder_id}: {error}' for reminder_id, error in failure])}"
+        message.outgoing_text_message += f"Failed to delete reminders: {', '.join([f'{reminder_id}: {error}' for reminder_id, error in failure])}\n"
     if message.outgoing_text_message:
         message.send_message()
     else:

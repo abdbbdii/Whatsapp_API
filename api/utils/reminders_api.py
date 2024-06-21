@@ -155,3 +155,4 @@ if __name__ == "__main__":
     # print(reminder_api.get_application("900").json())
     # print(reminder_api.find_application_id("remind"))
     # print(reminder_api.get_reminders_for_application("900").json())
+    print(reminder_api.delete_reminder("").text)

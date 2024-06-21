@@ -12,10 +12,38 @@ pluginInfo = {
     "internal": False,
 }
 
-# voices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 # sendMessage(phone, endpoint="send/file", files={"file": ttsResponse(args.prompt, args.voice if args.voice else "alloy")})
 # ffmpeg -i input.oga -acodec mp3 output.mp3
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "[text]",
+            "description": "Text to speech.",
+            "examples": [
+                "Hello!",
+                "This is a test message.",
+            ],
+        },
+        {
+            "command": "-v [voice] [text]",
+            "description": "Text to speech using a specific voice.",
+            "examples": [
+                "-v alloy Hello!",
+                "-v echo This is a test message.",
+            ],
+        },
+        {
+            "command": "-m [model] [text]",
+            "description": "Text to speech using a specific model.",
+            "examples": [
+                "-m tts-1 Hello!",
+                "-m tts-1-hd This is a test message.",
+            ],
+        },
+    ],
+    "note": "Available voices: alloy, echo, fable, onyx, nova, shimmer. Available models: tts-1, tts-1-hd.",
+}
 
 def handle_function(message: Message):
     try:

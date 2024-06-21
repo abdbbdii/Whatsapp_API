@@ -11,6 +11,86 @@ pluginInfo = {
     "internal": True,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "[quantity]x[price] [item]",
+            "description": "Add items with quantity.",
+            "examples": [
+                "2x100 Milk",
+                "3x50 Chips",
+            ],
+        },
+        {
+            "command": "[price] [item]",
+            "description": "Add items without quantity.",
+            "examples": [
+                "100 Milk",
+                "50 Chips",
+            ],
+        },
+        {
+            "command": "List",
+            "description": "Get list of items.",
+            "examples": [
+                "List",
+            ],
+        },
+        {
+            "command": "List withtime",
+            "description": "Get list of items with time.",
+            "examples": [
+                "List withtime",
+            ],
+        },
+        {
+            "command": "List all",
+            "description": "Get list of all participants.",
+            "examples": [
+                "List all",
+            ],
+        },
+        {
+            "command": "Edit [item#] [quantity]x[price] [item]",
+            "description": "Edit specific item in list.",
+            "examples": [
+                "Edit 1 2x100 Milk",
+                "Edit 2 3x50 Chips",
+            ],
+        },
+        {
+            "command": "Edit [item#] [price] [item]",
+            "description": "Edit specific item in list.",
+            "examples": [
+                "Edit 1 100 Milk",
+                "Edit 2 50 Chips",
+            ],
+        },
+        {
+            "command": "Clear",
+            "description": "Clear all items from list.",
+            "examples": [
+                "Clear",
+            ],
+        },
+        {
+            "command": "Clear [item#] [item#] ...",
+            "description": "Clear specific items from list.",
+            "examples": [
+                "Clear 1 2",
+                "Clear 1 2 3",
+            ],
+        },
+        {
+            "command": "Help",
+            "description": "Show this message.",
+            "examples": [
+                "Help",
+            ],
+        },
+    ],
+    "note": "Count spent money.",
+}
 
 def preprocess(message: Message) -> None:
     if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)):

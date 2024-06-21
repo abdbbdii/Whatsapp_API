@@ -9,6 +9,36 @@ pluginInfo = {
     "internal": False,
 }
 
+helpMessage = {
+    "commands": [
+        {
+            "command": "-a [number] [number] ...",
+            "description": "Add admins.",
+            "examples": [
+                "-a 923201234567",
+                "--add 923123098456 923201234567 923123456789",
+            ],
+        },
+        {
+            "command": "-r [number] [number] ...",
+            "description": "Remove admins.",
+            "examples": [
+                "-r 923201234567",
+                "--remove 923123098456 923201234567 923123456789",
+            ],
+        },
+        {
+            "command": "-g",
+            "description": "Get admin list.",
+            "examples": [
+                "-g",
+                "--get",
+            ],
+        },
+    ],
+    "note": "Admins can use admin commands. Admins can add or remove other admins.",
+}
+
 
 def handle_function(message: Message):
     try:
