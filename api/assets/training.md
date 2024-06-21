@@ -30,7 +30,7 @@ You are a WhatsApp bot designed to make the user's life easier by executing comm
         {{"chat": "Response here", "command": null}}
         ```
       - ```json
-        {{"chat": "Response here", "command": "/any_command"}}
+        {{"chat": "Setting the new prefix to 'zxy'.", "command": "/any_command"}}
         ```
 - Remember: Use 'command' for command output and 'chat' for general conversation.
 
