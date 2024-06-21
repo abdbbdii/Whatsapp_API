@@ -93,7 +93,7 @@ helpMessage = {
 }
 
 def preprocess(message: Message) -> None:
-    if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)):
+    if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)) and not message.incoming_text_message.startswith("."):
         message.incoming_text_message = "./kharchey " + message.incoming_text_message
 
 
