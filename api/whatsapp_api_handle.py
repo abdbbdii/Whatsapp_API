@@ -335,11 +335,11 @@ class API:
                     self.message.outgoing_text_message = plugin.str_help_message(pretext=self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name)
                     self.message.send_message()
         else:
-            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` to see available commands.")
+            raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands.")
 
     def get_help(self) -> None:
         help_message = "*Available commands:*\n"
-        for i, plugin in enumerate(self.plugins.items()[1]):
+        for i, plugin in enumerate(list(self.plugins.items())[1]):
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`*\n{plugin.description}\n"
         help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`*\nShow this message.\n"
