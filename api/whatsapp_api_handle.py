@@ -339,7 +339,7 @@ class API:
 
     def get_help(self) -> None:
         help_message = "*Available commands:*\n"
-        for i, plugin in enumerate(list(self.plugins.items())[1]):
+        for i, plugin in enumerate(self.plugins.values()):
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
                 help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`*\n{plugin.description}\n"
         help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`*\nShow this message.\n"
