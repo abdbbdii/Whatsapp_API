@@ -29,22 +29,24 @@ helpMessage = {
             ],
         },
         {
-            "command": "get",
-            "description": "Get reminders.",
-            "examples": [
-                "get",
-            ],
-        },
-        {
-            "command": "delete [reminder_id1] [reminder_id2] ...",
+            "command": "delete [reminder_id] [reminder_id] ...",
             "description": "Delete reminders.",
             "examples": [
                 "delete 1 2",
             ],
         },
+        {
+            "command": "get",
+            "description": "Get reminders.",
+        },
     ],
     "note": "Reminders are set based on the phone number of the sender.",
 }
+
+
+def preprocess(message: Message) -> None:
+    if message.document_type == "reminder_api" and str(message.document.get("application_id")) == appSettings.reminders_api_remind_id:
+        message.incoming_text_message = message.command_prefix + pluginInfo["command_name"]
 
 
 def create_reminder(message: Message, reminders_api: ReminderAPI):
@@ -108,7 +110,7 @@ def delete_reminder(message: Message, reminders_api: ReminderAPI):
 
 def handle_function(message: Message):
     if message.document_type == "reminder_api":
-        message.outgoing_text_message = message.document['title']
+        message.outgoing_text_message = message.document["title"]
         message.send_message()
     else:
         reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "api/reminder", ("admin", "admin"))

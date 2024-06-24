@@ -13,6 +13,9 @@ pluginInfo = {
     "internal": True,
 }
 
+def preprocess(message: Message) -> None:
+    if (message.document_type == "reminder_api" and str(message.document.get("application_id")) == appSettings.reminders_api_classroom_id) or message.document_type == "google_classroom_api":
+        message.incoming_text_message = message.command_prefix + pluginInfo["command_name"]
 
 def add_minutes(date: dict[str, int], time: dict[str, int], minutes: int):
     new_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) + timedelta(minutes=minutes)

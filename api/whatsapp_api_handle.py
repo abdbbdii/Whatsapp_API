@@ -304,7 +304,7 @@ class API:
     def message_handle(self) -> None:
         response = self.gptResponse()
         print(response)
-        if response.get("command"):
+        if response.get("console"):
             self.message.incoming_text_message = response["console"]
             self.message.process_incoming_text_message()
             self.command_handle()
