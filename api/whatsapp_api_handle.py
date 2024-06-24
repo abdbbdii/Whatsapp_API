@@ -278,8 +278,9 @@ class API:
             previous_messages.append({"role": "assistant", "content": response.response})
         return previous_messages
 
-    def save_response(self, response: str) -> None:
-        GPTResponse.objects.create(message=self.message.incoming_text_message, response=response, group=self.message.group, sender=self.message.sender)
+    def save_response(self, response: dict) -> None:
+        response["system"] = self.message.outgoing_text_message
+        GPTResponse.objects.create(message=self.message.incoming_text_message, response=json.dumps(response), group=self.message.group, sender=self.message.sender)
 
     def gptResponse(self) -> str:
         system_content = open("api/assets/training.md").read().format(help_message=self.get_all_help_message(), timezone=self.message.timezone, time=datetime.now(pytz.timezone(self.message.timezone)).strftime("%Y-%m-%d %H:%M:%S"))
@@ -313,7 +314,7 @@ class API:
             self.message.outgoing_text_message = response["chat"]
             self.message.send_message()
 
-        self.save_response(f'"chat": "{response.get("chat")}", "console": {response.get("console", "")}, "system": "{self.message.outgoing_text_message}"')
+        self.save_response(response)
 
         # self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
         # self.message.send_message()
