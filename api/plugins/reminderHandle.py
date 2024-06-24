@@ -36,6 +36,10 @@ helpMessage = {
             ],
         },
         {
+            "command": "delete all",
+            "description": "Delete all reminders.",
+        },
+        {
             "command": "get",
             "description": "Get reminders.",
         },
@@ -89,6 +93,13 @@ def get_reminders(message: Message, reminders_api: ReminderAPI):
 
 
 def delete_reminder(message: Message, reminders_api: ReminderAPI):
+    if len(message.arguments) < 3:
+        raise SendHelp
+    if message.arguments[2] == "all":
+        reminders_api.delete_reminders_for_application(appSettings.reminders_api_remind_id)
+        message.outgoing_text_message = "Successfully deleted all reminders."
+        message.send_message()
+        return
     success = []
     failure = []
     for reminder_id in message.arguments[2:]:
