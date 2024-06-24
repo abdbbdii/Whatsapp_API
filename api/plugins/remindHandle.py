@@ -6,7 +6,7 @@ from api.whatsapp_api_handle import Message, SendHelp
 from api.utils.reminders_api import ReminderAPI
 
 pluginInfo = {
-    "command_name": "remind",
+    "command_name": "reminder",
     "description": "Set a reminder for a specific date and time.",
     "admin_privilege": False,
     "internal": False,
@@ -108,7 +108,7 @@ def delete_reminder(message: Message, reminders_api: ReminderAPI):
 
 def handle_function(message: Message):
     if message.document_type == "reminder_api":
-        message.outgoing_text_message = f"Reminder: {message.document['title']}"
+        message.outgoing_text_message = message.document['title']
         message.send_message()
     else:
         reminders_api = ReminderAPI(appSettings.reminders_key, appSettings.public_url + "api/reminder", ("admin", "admin"))
