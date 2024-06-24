@@ -84,7 +84,7 @@ class Plugin:
     def str_help_message(self, pretext: str, note: bool = True) -> str:
         help_message = f"*Command Name: `{self.command_name}`*\n{self.description}\n\n*Usage:*\n\n"
         for i, command in enumerate(self.help_message["commands"]):
-            help_message += f"*{i+1}. {command['description']}*\n"
+            help_message += f"{i+1}. *{command['description']}*\n"
             help_message += f"`{pretext+' '+command['command'] if command['command'] else pretext}`\n"
             if "examples" in command:
                 help_message += "*Examples:*\n"
@@ -342,9 +342,9 @@ class API:
         i = 1
         for plugin in self.plugins.values():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                help_message += f"*{i}. `{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`*\n{plugin.description}\n"
+                help_message += f"{i}. *{plugin.description}*\n`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`\n"
                 i += 1
-        help_message += f"*{i}. `{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`*\nShow this message.\n"
+        help_message += f"{i}. *Show this message*\n`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`\n"
         return help_message
 
     def get_all_help_message(self) -> str:
@@ -354,9 +354,14 @@ class API:
                 continue
             help_message += plugin.str_help_message(pretext=self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name)
             help_message += "\n"
-        help_message += f"""*help*
-`{self.message.command_prefix + "help"}`
-- Show supported commands.
-`{self.message.command_prefix + appSettings.admin_command_prefix + "help"}`
-- Show supported admin commands."""
+        help_message += f"""*Command Name: `help`*
+Display help message for all available commands.
+
+*Usage:*
+
+1. *Show help message for all available commands*
+`{self.message.command_prefix}help`
+
+2. *Show help message for admin commands*
+`{self.message.command_prefix + appSettings.admin_command_prefix} help`"""
         return help_message
