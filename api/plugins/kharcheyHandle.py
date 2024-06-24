@@ -30,27 +30,6 @@ helpMessage = {
             ],
         },
         {
-            "command": "List",
-            "description": "Get list of items.",
-            "examples": [
-                "List",
-            ],
-        },
-        {
-            "command": "List withtime",
-            "description": "Get list of items with time.",
-            "examples": [
-                "List withtime",
-            ],
-        },
-        {
-            "command": "List all",
-            "description": "Get list of all participants.",
-            "examples": [
-                "List all",
-            ],
-        },
-        {
             "command": "Edit [item#] [quantity]x[price] [item]",
             "description": "Edit specific item in list.",
             "examples": [
@@ -67,13 +46,6 @@ helpMessage = {
             ],
         },
         {
-            "command": "Clear",
-            "description": "Clear all items from list.",
-            "examples": [
-                "Clear",
-            ],
-        },
-        {
             "command": "Clear [item#] [item#] ...",
             "description": "Clear specific items from list.",
             "examples": [
@@ -82,11 +54,24 @@ helpMessage = {
             ],
         },
         {
+            "command": "Clear",
+            "description": "Clear all items from list.",
+        },
+        {
+            "command": "List",
+            "description": "Get list of items.",
+        },
+        {
+            "command": "List withtime",
+            "description": "Get list of items with time.",
+        },
+        {
+            "command": "List all",
+            "description": "Get list of all participants.",
+        },
+        {
             "command": "Help",
             "description": "Show this message.",
-            "examples": [
-                "Help",
-            ],
         },
     ],
     "note": "Only the person who added the item can edit or clear it.",
