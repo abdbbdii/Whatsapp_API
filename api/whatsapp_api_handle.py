@@ -84,8 +84,8 @@ class Plugin:
     def str_help_message(self, pretext: str, note: bool = True) -> str:
         help_message = f"*Command Name: {self.command_name}*\n{self.description}\n\n*Usage:*\n\n"
         for i, command in enumerate(self.help_message["commands"]):
-            help_message += f"*{i+1}. `{pretext+' '+command['command'] if command['command'] else pretext}`*\n"
-            help_message += f"{command['description']}\n"
+            help_message += f"*{i+1}. {command['description']}*\n"
+            help_message += f"`{pretext+' '+command['command'] if command['command'] else pretext}`\n"
             if "examples" in command:
                 help_message += "*Examples:*\n"
             for example in command.get("examples", []):
