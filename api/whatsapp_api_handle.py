@@ -324,7 +324,7 @@ class API:
             raise SenderNotAdmin("You are not an admin and cannot use admin commands.")
 
         if self.message.arguments == [""] or self.message.arguments[0] == "help":
-            self.message.outgoing_text_message = self.get_all_help_message()  # TODO
+            self.message.outgoing_text_message = self.get_help()  # TODO
             self.message.send_message()
         elif self.message.arguments[0] in self.plugins:
             plugin = self.plugins[self.message.arguments[0]]
