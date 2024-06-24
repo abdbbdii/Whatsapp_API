@@ -82,7 +82,7 @@ class Plugin:
         return plugins
 
     def str_help_message(self, pretext: str, note: bool = True) -> str:
-        help_message = f"*Command Name: {self.command_name}*\n{self.description}\n\n*Usage:*\n\n"
+        help_message = f"*Command Name: `{self.command_name}`*\n{self.description}\n\n*Usage:*\n\n"
         for i, command in enumerate(self.help_message["commands"]):
             help_message += f"*{i+1}. {command['description']}*\n"
             help_message += f"`{pretext+' '+command['command'] if command['command'] else pretext}`\n"
