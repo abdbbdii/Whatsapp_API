@@ -350,7 +350,7 @@ class API:
     def get_all_help_message(self) -> str:
         help_message = ""
         for _, plugin in self.plugins.items():
-            if plugin.internal or not plugin.help_message:
+            if not plugin.help_message:
                 continue
             help_message += plugin.str_help_message(pretext=self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name)
             help_message += "\n"
