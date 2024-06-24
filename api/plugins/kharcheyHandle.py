@@ -1,7 +1,7 @@
 import re
 
 from api.models import Kharchey
-from api.whatsapp_api_handle import Message
+from api.whatsapp_api_handle import Message, SendHelp
 from api.appSettings import appSettings
 
 pluginInfo = {
@@ -89,7 +89,7 @@ helpMessage = {
             ],
         },
     ],
-    "note": "Count spent money.",
+    "note": "Only the person who added the item can edit or clear it.",
 }
 
 def preprocess(message: Message) -> None:
@@ -127,20 +127,7 @@ def handle_function(message: Message):
         return outgoing_text_message
 
     if message.arguments[1].casefold() == "Help".casefold():
-        message.outgoing_text_message = """*💵 Help 💵*
-- `[quantity]x[price] [item]`: Add items with quantity
-- `[price] [item]`: Add items without quantity
-- `List`: Get list of items
-- `List withtime`: Get list of items with time
-- `List all`: Get list of all participants
-- `Edit [item#] [quantity]x[price] [item]`: Edit specific item in list
-- `Edit [item#] [price] [item]`: Edit specific item in list
-- `Clear`: Clear all items from list
-- `Clear [item1#] [item2#] ...`: Clear specific items from list
-- `Help`: Show this message
-
-_Note: Only the person who added the item can clear it._"""
-        message.send_message()
+        raise SendHelp
 
     elif message.arguments[1].casefold() == "List".casefold():
         message.outgoing_text_message = "*💵 List 💵*\n"

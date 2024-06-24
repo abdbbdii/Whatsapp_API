@@ -1,4 +1,4 @@
-from api.whatsapp_api_handle import Message
+from api.whatsapp_api_handle import Message, SendHelp
 from api.appSettings import appSettings
 from argparse import ArgumentParser
 from requests import get
@@ -21,10 +21,11 @@ helpMessage = {
             ],
         },
         {
-            "command": "",
-            "description": "Echo image with caption.",
+            "command": "[caption]",
+            "description": "Echo image/video/document with caption.",
             "examples": [
-                "Attach image with caption.",
+                "Hello! (Attach image)",
+                "This is a test message. (Attach video)",
             ],
         },
     ],
@@ -41,13 +42,7 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
-        message.outgoing_text_message = f"""*Usage:*
-- Echo message: `{pretext} [message]`
-- Echo image with caption: Attach image with caption: `{pretext} [caption]`
-- Echo image without caption: Attach image with caption: `{pretext}`"""
-        message.send_message()
-        return
+        raise SendHelp
 
     if parsed.message:
         message.outgoing_text_message = message.incoming_text_message.lstrip(pluginInfo["command_name"]).strip()

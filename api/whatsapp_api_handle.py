@@ -38,15 +38,28 @@ class MessageNotValid(Exception):
     pass
 
 
+class SendHelp(Exception):
+    pass
+
+
 class Plugin:
-    def __init__(self, command_name: str, admin_privilege: bool, description: str, handle_function: Any, preprocess: Optional[Any] = None, internal: bool = False, help_message: Optional[dict[str, Any]] = None) -> None:
+    def __init__(
+        self,
+        command_name: str,
+        admin_privilege: bool,
+        description: str,
+        handle_function: Any,
+        preprocess: Optional[Any] = None,
+        internal: bool = False,
+        help_message: Optional[dict[str, Any]] = None,
+    ) -> None:
         self.command_name = command_name
         self.admin_privilege = admin_privilege
         self.description = description
         self.handle_function = handle_function
-        self.help_message = help_message
-        self.internal = internal
         self.preprocess = preprocess
+        self.internal = internal
+        self.help_message = help_message
 
     @staticmethod
     def load_plugins() -> Dict[str, "Plugin"]:
@@ -67,6 +80,19 @@ class Plugin:
                 help_message=plugin.helpMessage if "helpMessage" in dir(plugin) else None,
             )
         return plugins
+
+    def str_help_message(self, pretext: str, note: bool = True) -> str:
+        help_message = f"*Command Name: {self.command_name}*\n{self.description}\n\n*Usage:*\n\n"
+        for i, command in enumerate(self.help_message["commands"]):
+            help_message += f"*{i+1}. `{pretext+' '+command['command'] if command['command'] else pretext}`*\n"
+            help_message += f"{command['description']}\n"
+            if "examples" in command:
+                help_message += "*Examples:*\n"
+            for example in command.get("examples", []):
+                help_message += f"> {pretext} {example}\n"
+            help_message += "\n"
+        help_message += f"\n Note: {self.help_message['note']}\n" if "note" in self.help_message else "\n" if note else ""
+        return help_message
 
 
 class Message:
@@ -252,30 +278,8 @@ class API:
             previous_messages.append({"role": "assistant", "content": response.response})
         return previous_messages
 
-    def save_response(self, response) -> None:
+    def save_response(self, response: str) -> None:
         GPTResponse.objects.create(message=self.message.incoming_text_message, response=response, group=self.message.group, sender=self.message.sender)
-
-    def get_all_help_message(self) -> str:
-        help_message = ""
-        for _, plugin in self.plugins.items():
-            if plugin.internal or not plugin.help_message:
-                continue
-            pretext = self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name
-            help_message += f"## {plugin.command_name}\n"
-            for command in plugin.help_message["commands"]:
-                help_message += f"### `{pretext} {command['command']}`\n"
-                help_message += f"- {command['description']}\n"
-                if "examples" in command:
-                    help_message += "#### Examples:\n"
-                for example in command.get("examples", []):
-                    help_message += f"  - `{pretext} {example}`\n"
-            help_message += f"\n Note: {plugin.help_message['note']}\n" if "note" in plugin.help_message else "\n"
-        help_message += "## help\n"
-        help_message += f"### `{self.message.command_prefix}help`\n"
-        help_message += "- Show supported commands.\n"
-        help_message += f"### `{self.message.command_prefix + appSettings.admin_command_prefix} help`\n"
-        help_message += "- Show supported admin commands.\n"
-        return help_message
 
     def gptResponse(self) -> str:
         system_content = open("api/assets/training.md").read().format(help_message=self.get_all_help_message(), timezone=self.message.timezone, time=datetime.now(pytz.timezone(self.message.timezone)).strftime("%Y-%m-%d %H:%M:%S"))
@@ -301,7 +305,7 @@ class API:
         response = self.gptResponse()
         print(response)
         if response.get("command"):
-            self.message.incoming_text_message = response["command"]
+            self.message.incoming_text_message = response["console"]
             self.message.process_incoming_text_message()
             self.command_handle()
         if response.get("chat"):
@@ -309,7 +313,7 @@ class API:
             self.message.outgoing_text_message = response["chat"]
             self.message.send_message()
 
-        self.save_response(f'"chat": "{response.get('chat')}", "command": {response.get('command', '')}, "backend_response": "{self.message.outgoing_text_message}"')
+        self.save_response(f'"chat": "{response.get("chat")}", "console": {response.get("console", "")}, "system": "{self.message.outgoing_text_message}"')
 
         # self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
         # self.message.send_message()
@@ -323,21 +327,33 @@ class API:
         elif self.message.arguments[0] in self.plugins:
             plugin = self.plugins[self.message.arguments[0]]
             if plugin.admin_privilege == self.message.admin_privilege:
-                plugin.handle_function(self.message)
+                try:
+                    plugin.handle_function(self.message)
+                except SendHelp:
+                    self.message.outgoing_text_message = plugin.str_help_message(pretext=self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name)
+                    self.message.send_message()
         else:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` to see available commands.")
 
     def send_help(self) -> None:
-        help_message = {}
-        prefix = appSettings.admin_command_prefix + " " if self.message.admin_privilege else ""
-
+        help_message = "*Available commands:*\n"
         for _, plugin in self.plugins.items():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                help_message[prefix + plugin.command_name] = plugin.description
-
-        help_message[prefix + "help"] = "Show this message."
-        self.message.outgoing_text_message = "*Available commands:*\n"
-
-        for command, description in help_message.items():
-            self.message.outgoing_text_message += f"- `{self.message.command_prefix + command}`: {description}\n"
+                help_message += f'*`{self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name}`*\n- {plugin.description}\n'
+        help_message += f'*`{self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + "help"}`*\n- Show this message.\n'
+        self.message.outgoing_text_message = help_message
         self.message.send_message()
+
+    def get_all_help_message(self) -> str:
+        help_message = ""
+        for _, plugin in self.plugins.items():
+            if plugin.internal or not plugin.help_message:
+                continue
+            help_message += plugin.str_help_message(pretext=self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name)
+            help_message += "\n"
+        help_message += f"""*help*
+`{self.message.command_prefix + "help"}`
+- Show supported commands.
+`{self.message.command_prefix + appSettings.admin_command_prefix + "help"}`
+- Show supported admin commands."""
+        return help_message

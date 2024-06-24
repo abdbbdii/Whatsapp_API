@@ -1,4 +1,4 @@
-from api.whatsapp_api_handle import Message
+from api.whatsapp_api_handle import Message, SendHelp
 from api.appSettings import appSettings
 from argparse import ArgumentParser
 
@@ -46,16 +46,7 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
-        message.outgoing_text_message = f"""*Usage:*
-- Change setting: `{pretext} -c [setting] [value]`
-- View setting: `{pretext} -g [setting]`
-- View all settings: `{pretext} -g all`
-
-*Available settings:*
-- {'\n- '.join(appSettings.list())}"""
-        message.send_message()
-        return
+        raise SendHelp
 
     if parsed.change:
         appSettings.update(parsed.change[0], parsed.change[1])

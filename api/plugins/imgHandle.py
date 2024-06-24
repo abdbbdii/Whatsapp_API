@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from openai import OpenAI, NotFoundError
 
 from api.appSettings import appSettings
-from api.whatsapp_api_handle import Message
+from api.whatsapp_api_handle import Message, SendHelp
 
 pluginInfo = {
     "command_name": "img",
@@ -43,12 +43,7 @@ def handle_function(message: Message):
         parsed = parser(message.arguments[1:])
 
     except SystemExit:
-        pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
-        message.outgoing_text_message = f"""*Usage:*
-- Generate Image: `{pretext} [description]`
-- Generate Image using a specific model: `{pretext} -m [model] [description]`"""
-        message.send_message()
-        return
+        raise SendHelp
 
     if parsed.description:
         try:

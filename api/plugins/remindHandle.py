@@ -2,7 +2,7 @@ import json
 from argparse import ArgumentParser
 
 from api.appSettings import appSettings
-from api.whatsapp_api_handle import Message
+from api.whatsapp_api_handle import Message, SendHelp
 from api.utils.reminders_api import ReminderAPI
 
 pluginInfo = {
@@ -106,16 +106,6 @@ def delete_reminder(message: Message, reminders_api: ReminderAPI):
         raise SystemExit
 
 
-def get_help(message: Message):
-    pretext = message.command_prefix + (appSettings.admin_command_prefix + " " if pluginInfo["admin_privilege"] else "") + pluginInfo["command_name"]
-    message.outgoing_text_message = f"""*Usage:*
-- Create reminder: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -m [message]`
-- Create reminder with recurrence rule: `{pretext} create -d [YYYY-MM-DD] -t [HH:MM] -r [RRULE] -m [message]`
-- Get reminders: `{pretext} get`
-- Delete reminder: `{pretext} delete [reminder_id1] [reminder_id2] ...`"""
-    message.send_message()
-
-
 def handle_function(message: Message):
     if message.document_type == "reminder_api":
         message.outgoing_text_message = f"Reminder: {message.document['title']}"
@@ -141,9 +131,9 @@ def handle_function(message: Message):
                 case "get":
                     get_reminders(message, reminders_api)
                 case _:
-                    get_help(message)
+                    raise SendHelp
         except SystemExit:
-            get_help(message)
+            raise SendHelp
 
 
 def craete_parser(args: str) -> ArgumentParser:
