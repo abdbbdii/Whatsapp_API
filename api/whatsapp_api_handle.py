@@ -324,7 +324,8 @@ class API:
             raise SenderNotAdmin("You are not an admin and cannot use admin commands.")
 
         if self.message.arguments == [""] or self.message.arguments[0] == "help":
-            self.send_help()
+            self.message.outgoing_text_message = self.get_help()
+            self.message.send_message()
         elif self.message.arguments[0] in self.plugins:
             plugin = self.plugins[self.message.arguments[0]]
             if plugin.admin_privilege == self.message.admin_privilege:
@@ -336,14 +337,12 @@ class API:
         else:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` to see available commands.")
 
-    def send_help(self) -> None:
+    def get_help(self) -> None:
         help_message = "*Available commands:*\n"
-        for _, plugin in self.plugins.items():
+        for i, plugin in enumerate(self.plugins.items()[1]):
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                help_message += f'*`{self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + plugin.command_name}`*\n- {plugin.description}\n'
-        help_message += f'*`{self.message.command_prefix + (appSettings.admin_command_prefix + " " if plugin.admin_privilege else "") + "help"}`*\n- Show this message.\n'
-        self.message.outgoing_text_message = help_message
-        self.message.send_message()
+                help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`*\n{plugin.description}\n"
+        help_message += f"{i+1}. *`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`*\nShow this message.\n"
 
     def get_all_help_message(self) -> str:
         help_message = ""
