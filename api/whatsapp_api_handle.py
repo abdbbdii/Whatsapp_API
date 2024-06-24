@@ -91,7 +91,7 @@ class Plugin:
             for example in command.get("examples", []):
                 help_message += f"> {pretext} {example}\n"
             help_message += "\n"
-        help_message += f"\n{self.help_message['note']}\n" if "note" in self.help_message else "\n" if note else ""
+        help_message += f"{self.help_message['note']}\n" if "note" in self.help_message else "\n" if note else ""
         return help_message
 
 
