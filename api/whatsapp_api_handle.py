@@ -338,11 +338,11 @@ class API:
             raise CommandNotFound(f"Command `{self.message.arguments[0]}` not found. Write `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands.")
 
     def get_help(self) -> None:
-        help_message = "*Available commands:*\n"
+        help_message = "*Available commands:*\n\n"
         i = 1
         for plugin in self.plugins.values():
             if plugin.admin_privilege == self.message.admin_privilege and not plugin.internal:
-                help_message += f"*{i}. {plugin.description}*\n`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`\n"
+                help_message += f"*{i}. {plugin.description}*\n`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + plugin.command_name}`\n\n"
                 i += 1
         help_message += f"*{i}. Show this message*\n`{self.message.command_prefix + (appSettings.admin_command_prefix + ' ' if plugin.admin_privilege else '') + 'help'}`\n"
         return help_message
