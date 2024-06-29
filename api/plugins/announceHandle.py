@@ -7,7 +7,7 @@ from api.models import Users
 pluginInfo = {
     "command_name": "announce",
     "admin_privilege": True,
-    "description": "Announce a message to all users.",
+    "description": "Announce a message to all users. (Needs testing.)",
     "internal": False,
 }
 

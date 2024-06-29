@@ -77,9 +77,10 @@ helpMessage = {
     "note": "Only the person who added the item can edit or clear it.",
 }
 
+
 def preprocess(message: Message) -> None:
     if message.group == appSettings.kharchey_group_id and message.incoming_text_message and not bool(re.match(r"\.[^\.].*", message.incoming_text_message)) and not message.incoming_text_message.startswith("."):
-        message.incoming_text_message = "./kharchey " + message.incoming_text_message
+        message.incoming_text_message = "./" + pluginInfo["command_name"] + " " + message.incoming_text_message
 
 
 def handle_function(message: Message):
@@ -102,7 +103,7 @@ def handle_function(message: Message):
         outgoing_text_message = ""
         items = Kharchey.objects.filter(group=message.group, sender=message.sender).order_by("date") if not all else Kharchey.objects.filter(group=message.group).order_by("date")
         for i, item in enumerate(items):
-            time = f"`{item.date.day:02d}/{item.date.month:02d}/{item.date.year:04d} {((item.date.hour - 12) if item.date.hour > 12 else item.date.hour):02d}:{item.date.minute:02d} {"PM" if item.date.hour > 12 else "AM"}` " if withtime else ""
+            time = f"`{item.date.day:02d}/{item.date.month:02d}/{item.date.year:04d} {((item.date.hour - 12) if item.date.hour > 12 else item.date.hour):02d}:{item.date.minute:02d} {'PM' if item.date.hour > 12 else 'AM'}` " if withtime else ""
             outgoing_text_message += f"{i+1}. {time}`Rs. {str(item.quantity)+'x'+str(item.price)+'='+str(item.quantity*item.price) if item.quantity > 1 else str(item.price)}` for {item.item}\n"
             total += item.quantity * item.price
         if total:
