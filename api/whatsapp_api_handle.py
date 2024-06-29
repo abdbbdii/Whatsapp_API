@@ -2,7 +2,6 @@ import re
 import os
 import json
 import importlib.util
-from shlex import split
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 from datetime import datetime
@@ -13,7 +12,7 @@ import phonenumbers
 from openai import OpenAI
 from django.utils import timezone
 
-from api.models import GPTResponse
+from api.models import GPTResponse, Users
 from api.appSettings import appSettings
 from Whatsapp_API.settings import DEBUG
 
@@ -254,8 +253,13 @@ class API:
         self.request_timestamp = timezone.now()
         self.message = Message(data)
         self.plugins = Plugin.load_plugins()
+
+        self.start_prosess()
+
+    def start_prosess(self) -> None:
         self.preprocess()
         self.message.process_incoming_text_message()
+        self.register_user()
 
         try:
             if self.message.arguments:
@@ -265,6 +269,12 @@ class API:
         except (CommandNotFound, SenderNotAdmin) as e:
             self.message.outgoing_text_message = str(e)
             self.message.send_message()
+
+    def register_user(self) -> None:
+        user = Users.objects.get_or_create(user_id=self.message.sender, group_id=self.message.group)
+        if not user[0].description:
+            user[0].description = json.dumps({"group_name": "signedup"})
+            user[0].save()
 
     def preprocess(self) -> None:
         for _, plugin in self.plugins.items():
@@ -306,7 +316,10 @@ class API:
         response = self.gptResponse()
         print(response)
         if response.get("console"):
-            self.message.incoming_text_message = response["console"]
+            if response["console"].startswith(self.message.command_prefix):
+                self.message.incoming_text_message = response["console"]
+            else:
+                self.resolve_console(response["console"])
             self.message.process_incoming_text_message()
             self.command_handle()
         if response.get("chat"):
@@ -319,12 +332,21 @@ class API:
         # self.message.outgoing_text_message = f"Hello, I am a bot. Use `{self.message.command_prefix}help` (or `{self.message.command_prefix + appSettings.admin_command_prefix} help` if you are an admin) to see available commands."
         # self.message.send_message()
 
+    def resolve_console(self, console: str) -> None:
+        if console.startswith('/'):
+            console = self.message.command_prefix + console[1:]
+        elif console.startswith('./'):
+            console = self.message.command_prefix + console[2:]
+        else:
+            console = self.message.command_prefix + console
+        self.message.incoming_text_message = console
+
     def command_handle(self) -> None:
         if self.message.arguments[0] == appSettings.admin_command_prefix and not self.message.admin_privilege:
             raise SenderNotAdmin("You are not an admin and cannot use admin commands.")
 
         if self.message.arguments == [""] or self.message.arguments[0] == "help":
-            self.message.outgoing_text_message = self.get_help()  # TODO
+            self.message.outgoing_text_message = self.get_help()
             self.message.send_message()
         elif self.message.arguments[0] in self.plugins:
             plugin = self.plugins[self.message.arguments[0]]
