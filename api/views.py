@@ -20,7 +20,9 @@ def classroom(request):
                 "document": json.loads(request.body.decode("utf-8")),
                 "document_type": "google_classroom_api",
                 "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
-                "message": {},
+                "message": {
+                    "text": "./google_classroom_api",
+                },
             }
         )
         return JsonResponse({"statusCode": 200, "message": "Notification sent successfully."})
@@ -42,7 +44,9 @@ def reminder(request):
                             "document": reminder,
                             "document_type": "reminder_api",
                             "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {notes["sender"]}@g.us",
-                            "message": {},
+                            "message": {
+                                "text": "./reminder_api",
+                            },
                         }
                     )
                 case appSettings.reminders_api_remind_id:
@@ -51,7 +55,9 @@ def reminder(request):
                             "document": reminder,
                             "document_type": "reminder_api",
                             "from": f"{notes["sender"]}@s.whatsapp.net",
-                            "message": {},
+                            "message": {
+                                "text": "./reminder_api",
+                            },
                         }
                     )
 
