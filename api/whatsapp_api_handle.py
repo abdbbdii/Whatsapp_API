@@ -157,6 +157,8 @@ class Message:
                 self.incoming_text_message = data[media_type]["caption"].replace("\xa0", " ")
                 self.media_type = media_type
                 return
+        print(data)
+        print(type(data))
         self.incoming_text_message = data["message"]["text"].replace("\xa0", " ")
 
     def set_media(self, data: dict) -> None:
