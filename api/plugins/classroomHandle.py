@@ -109,12 +109,17 @@ def handle_function(message: Message):
         else:
             time = ""
 
+        if message.document["content"]["activity"].get("dueDate") is None:
+            due = "No due date provided"
+        else:
+            due = f'{"/".join(list(map(str, message.document["content"]["activity"]["dueDate"].values())))} {time}'
+
         message.outgoing_text_message = make_message(
             header=f'New {message.document["content"]["activity"]["workType"].title()} created for {message.document["content"]["course"]["descriptionHeading"]}',
             items={
                 "📝 Title": message.document["content"]["activity"]["title"],
                 "📄 Description": message.document["content"]["activity"].get("description"),
-                "⏰ Due": f'{"/".join(list(map(str, message.document["content"]["activity"].get("dueDate", {}).values())))} {time}',
+                "⏰ Due": due,
                 "🏆 Points": message.document["content"]["activity"].get("maxPoints"),
                 "🔗 Link": message.document["content"]["activity"]["alternateLink"],
             },
@@ -155,6 +160,7 @@ def handle_function(message: Message):
                 },
             )
             message.media = {"file": [material["driveFile"]["driveFile"]["title"], download_gdrive_file(material["driveFile"]["driveFile"]["alternateLink"])]}
+            print("sending media")
             message.send_file()
 
         elif list(material.keys())[0] == "youtubeVideo":
