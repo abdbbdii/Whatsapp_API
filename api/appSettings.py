@@ -31,12 +31,13 @@ class AppSettings:
         self.reminders_api_classroom_id = settings.reminders_api_classroom_id_test if django_settings.DEBUG else settings.reminders_api_classroom_id
         self.reminders_api_classroom_name = settings.reminders_api_classroom_name_test if django_settings.DEBUG else settings.reminders_api_classroom_name
         self.reminders_key = settings.reminders_key
-        self.token_pickle_base64 = settings.token_pickle_base64
-        self.google_credentials = settings.google_credentials
+        self.google_creds = settings.google_creds
         self.ocr_space_api_key = settings.ocr_space_api_key
         self.openai_api_key = settings.openai_api_key
         self.kharchey_group_id = settings.kharchey_group_id
         self.reminders_api_remind_id = settings.reminders_api_remind_id
+        self.utils_server_url = settings.utils_server_url
+        self.utils_server_password = settings.utils_server_password
 
     def __str__(self) -> str:
         return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
@@ -90,7 +91,7 @@ class AppSettings:
 
 try:
     appSettings = AppSettings()
-    
+
 except ProgrammingError:
 
     class AppSettings:
@@ -103,11 +104,12 @@ except ProgrammingError:
             self.classroom_group_id = ""
             self.reminders_api_classroom_id = ""
             self.reminders_key = ""
-            self.token_pickle_base64 = ""
-            self.google_credentials = ""
+            self.google_creds = ""
             self.ocr_space_api_key = ""
             self.openai_api_key = ""
             self.kharchey_group_id = ""
             self.reminders_api_remind_id = ""
+            self.utils_server_url = ""
+            self.utils_server_password = ""
 
     appSettings = AppSettings()

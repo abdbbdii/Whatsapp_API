@@ -17,12 +17,13 @@ class Settings(models.Model):
     reminders_api_classroom_name = models.TextField(default=None, null=True)
     reminders_api_classroom_name_test = models.TextField(default=None, null=True)
     reminders_key = models.TextField(default=None, null=True)
-    token_pickle_base64 = models.TextField(default=None, null=True)
-    google_credentials = models.TextField(default=None, null=True)
+    google_creds = models.TextField(default=None, null=True)
     ocr_space_api_key = models.TextField(default=None, null=True)
     openai_api_key = models.TextField(default=None, null=True)
     kharchey_group_id = models.TextField(default=None, null=True)
     reminders_api_remind_id = models.TextField(default=None, null=True)
+    utils_server_url = models.TextField(default=None, null=True)
+    utils_server_password = models.TextField(default=None, null=True)
 
 
 class Kharchey(models.Model):
