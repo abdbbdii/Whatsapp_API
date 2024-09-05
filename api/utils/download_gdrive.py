@@ -37,8 +37,8 @@ def download_gdrive_file(gdrive_link):
     )
     if r.status_code != 200:
         return None
-    appSettings.update('google_creds', json.loads(r.json().get("google_creds")))
-    service = build("drive", "v3", credentials=appSettings.google_creds)
+    appSettings.update('token_pickle_base64', json.loads(r.json().get("token_pickle_base64")))
+    service = build("drive", "v3", credentials=appSettings.token_pickle_base64)
     file_id = get_file_id_from_link(gdrive_link)
     file_data = get_file_data(service, file_id)
     return file_data

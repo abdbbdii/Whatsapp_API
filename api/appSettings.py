@@ -31,7 +31,7 @@ class AppSettings:
         self.reminders_api_classroom_id = settings.reminders_api_classroom_id_test if django_settings.DEBUG else settings.reminders_api_classroom_id
         self.reminders_api_classroom_name = settings.reminders_api_classroom_name_test if django_settings.DEBUG else settings.reminders_api_classroom_name
         self.reminders_key = settings.reminders_key
-        self.google_creds = settings.google_creds
+        self.token_pickle_base64 = settings.token_pickle_base64
         self.ocr_space_api_key = settings.ocr_space_api_key
         self.openai_api_key = settings.openai_api_key
         self.kharchey_group_id = settings.kharchey_group_id
@@ -104,7 +104,7 @@ except ProgrammingError:
             self.classroom_group_id = ""
             self.reminders_api_classroom_id = ""
             self.reminders_key = ""
-            self.google_creds = ""
+            self.token_pickle_base64 = ""
             self.ocr_space_api_key = ""
             self.openai_api_key = ""
             self.kharchey_group_id = ""
