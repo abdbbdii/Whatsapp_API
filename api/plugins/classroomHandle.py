@@ -90,63 +90,63 @@ def handle_function(message: Message):
     elif message.document_type != "google_classroom_api":
         return
 
-    owner_name = message.document["content"]["course"]["ownerName"]
+    owner_name = message.document["course"]["ownerName"]
 
-    if message.document["content"]["type"] == "material":
+    if message.document["type"] == "material":
         message.outgoing_text_message = make_message(
-            header=f'New Material for {message.document["content"]["course"]["descriptionHeading"]}',
+            header=f'New Material for {message.document["course"]["descriptionHeading"]}',
             items={
-                "📝 Title": message.document["content"]["activity"]["title"],
-                "📄 Description": message.document["content"]["activity"].get("description"),
-                "🔗 Link": message.document["content"]["activity"]["alternateLink"],
+                "📝 Title": message.document["activity"]["title"],
+                "📄 Description": message.document["activity"].get("description"),
+                "🔗 Link": message.document["activity"]["alternateLink"],
             },
         )
 
-    elif message.document["content"]["type"] == "coursework":
-        if message.document["content"]["activity"].get("dueTime"):
-            message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"] = add_minutes(message.document["content"]["activity"]["dueDate"], message.document["content"]["activity"]["dueTime"], 5 * 60)
+    elif message.document["type"] == "coursework":
+        if message.document["activity"].get("dueTime"):
+            message.document["activity"]["dueDate"], message.document["activity"]["dueTime"] = add_minutes(message.document["activity"]["dueDate"], message.document["activity"]["dueTime"], 5 * 60)
 
-        if time := message.document["content"]["activity"].get("dueTime"):
+        if time := message.document["activity"].get("dueTime"):
             time = f'{((time["hours"] - 12) if time["hours"] > 12 else time["hours"]):02d}:{time["minutes"]:02d} {"PM" if time["hours"] > 12 else "AM"}'
         else:
             time = ""
 
-        if message.document["content"]["activity"].get("dueDate") is None:
+        if message.document["activity"].get("dueDate") is None:
             due = "No due date provided"
         else:
-            due = f'{"/".join(list(map(str, message.document["content"]["activity"]["dueDate"].values())))} {time}'
+            due = f'{"/".join(list(map(str, message.document["activity"]["dueDate"].values())))} {time}'
 
         message.outgoing_text_message = make_message(
-            header=f'New {message.document["content"]["activity"]["workType"].title()} created for {message.document["content"]["course"]["descriptionHeading"]} by {owner_name}',
+            header=f'New {message.document["activity"]["workType"].title()} created for {message.document["course"]["descriptionHeading"]} by {owner_name}',
             items={
-                "📝 Title": message.document["content"]["activity"]["title"],
-                "📄 Description": message.document["content"]["activity"].get("description"),
+                "📝 Title": message.document["activity"]["title"],
+                "📄 Description": message.document["activity"].get("description"),
                 "⏰ Due": due,
-                "🏆 Points": message.document["content"]["activity"].get("maxPoints"),
-                "🔗 Link": message.document["content"]["activity"]["alternateLink"],
+                "🏆 Points": message.document["activity"].get("maxPoints"),
+                "🔗 Link": message.document["activity"]["alternateLink"],
             },
             footer="Good Luck ✌️",
         )
 
-    elif message.document["content"]["type"] == "announcement":
+    elif message.document["type"] == "announcement":
         message.outgoing_text_message = make_message(
-            header=f'New Announcement for {message.document["content"]["course"]["descriptionHeading"]} by {owner_name}',
+            header=f'New Announcement for {message.document["course"]["descriptionHeading"]} by {owner_name}',
             items={
-                "💬 Text": message.document["content"]["activity"]["text"],
-                "🔗 Link": message.document["content"]["activity"]["alternateLink"],
+                "💬 Text": message.document["activity"]["text"],
+                "🔗 Link": message.document["activity"]["alternateLink"],
             },
         )
-        message.document["content"]["activity"]["title"] = "Announcement"
+        message.document["activity"]["title"] = "Announcement"
     message.send_message()
 
-    if message.document["content"]["activity"].get("dueDate"):
+    if message.document["activity"].get("dueDate"):
         set_reminder(
-            message.document["content"]["activity"].get("dueDate"),
-            message.document["content"]["activity"].get("dueTime"),
-            message.document["content"]["activity"]["title"],
-            message.document["content"]["activity"]["alternateLink"],
+            message.document["activity"].get("dueDate"),
+            message.document["activity"].get("dueTime"),
+            message.document["activity"]["title"],
+            message.document["activity"]["alternateLink"],
         )
-    materials = message.document["content"]["activity"].get("materials")
+    materials = message.document["activity"].get("materials")
 
     if not materials:
         return
@@ -154,7 +154,7 @@ def handle_function(message: Message):
     for i, material in enumerate(materials):
         if list(material.keys())[0] == "driveFile":
             message.outgoing_text_message = make_message(
-                header=f'Material {i+1} of {len(materials)} for {message.document["content"]["activity"]["title"]}',
+                header=f'Material {i+1} of {len(materials)} for {message.document["activity"]["title"]}',
                 items={
                     "📝 Title": material["driveFile"]["driveFile"]["title"],
                     "📄 Description": material["driveFile"]["driveFile"].get("description"),
@@ -167,7 +167,7 @@ def handle_function(message: Message):
 
         elif list(material.keys())[0] == "youtubeVideo":
             message.outgoing_text_message = make_message(
-                header=f'Material {i+1} of {len(materials)} for {message.document["content"]["activity"]["title"]}',
+                header=f'Material {i+1} of {len(materials)} for {message.document["activity"]["title"]}',
                 items={
                     "📝 Title": material["youtubeVideo"]["title"],
                     "🔗 YouTube Link": material["youtubeVideo"]["alternateLink"],
@@ -177,7 +177,7 @@ def handle_function(message: Message):
 
         elif list(material.keys())[0] == "link":
             message.outgoing_text_message = make_message(
-                header=f'Material {i+1} of {len(materials)} for {message.document["content"]["activity"]["title"]}',
+                header=f'Material {i+1} of {len(materials)} for {message.document["activity"]["title"]}',
                 items={
                     "📝 Title": material["link"]["title"],
                     "🔗 Link": material["link"]["url"],
