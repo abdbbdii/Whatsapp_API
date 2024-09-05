@@ -33,7 +33,7 @@ def get_file_id_from_link(link):
 def download_gdrive_file(gdrive_link):
     """Gets the file data in bytes from Google Drive given its link."""
     r = requests.get(
-        appSettings.utils_server + "service/google_auth/",
+        appSettings.utils_server_url + "service/google_auth/",
         json={
             "password": appSettings.utils_server_password,
             "scopes": [
