@@ -1,4 +1,5 @@
-import json
+import base64
+import pickle
 
 import io
 import requests
@@ -33,12 +34,13 @@ def download_gdrive_file(gdrive_link):
     """Gets the file data in bytes from Google Drive given its link."""
     r = requests.get(
         appSettings.utils_server + "service/google_auth/",
-        json={"password": appSettings.utils_server_password, "scopes": ["https://www.googleapis.com/auth/drive.readonly"]},
+        json={"password": appSettings.utils_server_password, "scopes": ["https://www.googleapis.com/auth/drive.readonly"], "token_pickle_base64": appSettings.token_pickle_base64},
     )
     if r.status_code != 200:
         return None
-    appSettings.update('token_pickle_base64', json.loads(r.json().get("token_pickle_base64")))
-    service = build("drive", "v3", credentials=appSettings.token_pickle_base64)
+    if r.json().get("token_pickle_base64") != appSettings.token_pickle_base64:
+        appSettings.update('token_pickle_base64', r.json().get("token_pickle_base64"))
+    service = build("drive", "v3", credentials=pickle.loads(base64.b64decode(appSettings.token_pickle_base64)))
     file_id = get_file_id_from_link(gdrive_link)
     file_data = get_file_data(service, file_id)
     return file_data
