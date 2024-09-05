@@ -90,8 +90,6 @@ def handle_function(message: Message):
     elif message.document_type != "google_classroom_api":
         return
 
-    owner_name = message.document["course"]["ownerName"]
-
     if message.document["type"] == "material":
         message.outgoing_text_message = make_message(
             header=f'New Material for {message.document["course"]["descriptionHeading"]}',
@@ -117,7 +115,7 @@ def handle_function(message: Message):
             due = f'{"/".join(list(map(str, message.document["activity"]["dueDate"].values())))} {time}'
 
         message.outgoing_text_message = make_message(
-            header=f'New {message.document["activity"]["workType"].title()} created for {message.document["course"]["descriptionHeading"]} by {owner_name}',
+            header=f'New {message.document["activity"]["workType"].title()} created for {message.document["course"]["descriptionHeading"]}',
             items={
                 "📝 Title": message.document["activity"]["title"],
                 "📄 Description": message.document["activity"].get("description"),
@@ -130,7 +128,7 @@ def handle_function(message: Message):
 
     elif message.document["type"] == "announcement":
         message.outgoing_text_message = make_message(
-            header=f'New Announcement for {message.document["course"]["descriptionHeading"]} by {owner_name}',
+            header=f'New Announcement for {message.document["course"]["descriptionHeading"]}',
             items={
                 "💬 Text": message.document["activity"]["text"],
                 "🔗 Link": message.document["activity"]["alternateLink"],
