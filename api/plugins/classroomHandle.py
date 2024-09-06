@@ -90,7 +90,7 @@ def handle_function(message: Message):
     elif message.document_type != "google_classroom_api":
         return
 
-    if message.document["type"] == "material":
+    if message.document["type"] == "courseWorkMaterial":
         message.outgoing_text_message = make_message(
             header=f'New Material for {message.document["course"]["descriptionHeading"]}',
             items={
@@ -100,7 +100,7 @@ def handle_function(message: Message):
             },
         )
 
-    elif message.document["type"] == "coursework":
+    elif message.document["type"] == "courseWork":
         if message.document["activity"].get("dueTime"):
             message.document["activity"]["dueDate"], message.document["activity"]["dueTime"] = add_minutes(message.document["activity"]["dueDate"], message.document["activity"]["dueTime"], 5 * 60)
 
@@ -126,7 +126,7 @@ def handle_function(message: Message):
             footer="Good Luck ✌️",
         )
 
-    elif message.document["type"] == "announcement":
+    elif message.document["type"] == "announcements":
         message.outgoing_text_message = make_message(
             header=f'New Announcement for {message.document["course"]["descriptionHeading"]}',
             items={
@@ -159,7 +159,9 @@ def handle_function(message: Message):
                     "🔗 Link": material["driveFile"]["driveFile"]["alternateLink"],
                 },
             )
-            message.media = {"file": [material["driveFile"]["driveFile"]["title"], download_gdrive_file(material["driveFile"]["driveFile"]["alternateLink"])]}
+            print(material["driveFile"]["driveFile"])
+            gdrive_file = download_gdrive_file(material["driveFile"]["driveFile"]["alternateLink"])
+            message.media = {"file": [material["driveFile"]["driveFile"]["title"], gdrive_file]}
             print("sending media")
             message.send_file()
 
