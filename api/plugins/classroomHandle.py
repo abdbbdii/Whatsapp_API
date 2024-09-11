@@ -1,10 +1,14 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
+
+from django.utils import timezone
 
 from api.whatsapp_api_handle import Message
 from api.utils.reminders_api import ReminderAPI
 from api.utils.download_gdrive import download_gdrive_file
 from api.appSettings import appSettings
+
 
 pluginInfo = {
     "command_name": "classroom",
@@ -13,9 +17,11 @@ pluginInfo = {
     "internal": True,
 }
 
+
 def preprocess(message: Message) -> None:
     if (message.document_type == "reminder_api" and str(message.document.get("application_id")) == appSettings.reminders_api_classroom_id) or message.document_type == "google_classroom_api":
         message.incoming_text_message = message.command_prefix + pluginInfo["command_name"]
+
 
 def add_minutes(date: dict[str, int], time: dict[str, int], minutes: int):
     new_datetime = datetime(date.get("year", 0), date.get("month", 0), date.get("day", 0), time.get("hours", 0), time.get("minutes", 0)) + timedelta(minutes=minutes)
@@ -84,7 +90,14 @@ def handle_function(message: Message):
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*\n\nYou should start submitting your work now.\n{notes["link"]}'
             case _:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
-        message.send_message()
+
+        last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
+        if timezone.now() - last_outgoing_message_time < timedelta(minutes=2) and message.outgoing_text_message == appSettings.last_outgoing_message:
+            print("Message already sent")
+        else:
+            message.send_message()
+            appSettings.update("last_outgoing_message", message.outgoing_text_message)
+        appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
         return
 
     elif message.document_type != "google_classroom_api":
