@@ -1,7 +1,12 @@
-from django.http import JsonResponse
-from api.whatsapp_api_handle import API
 import json
+from datetime import datetime
+from datetime import timedelta
+
+from django.utils import timezone
+from django.http import JsonResponse
+
 from .appSettings import appSettings
+from api.whatsapp_api_handle import API
 
 def whatsapp(request):
     if request.method == "POST":
@@ -15,9 +20,11 @@ def whatsapp(request):
 def classroom(request):
     if request.method == "POST":
         print("POST /api/classroom")
+        body = json.loads(request.body.decode("utf-8"))
+        print(body)
         API(
             {
-                "document": json.loads(request.body.decode("utf-8")),
+                "document": body,
                 "document_type": "google_classroom_api",
                 "from": f"{appSettings.admin_ids[0]}@s.whatsapp.net in {appSettings.classroom_group_id}@g.us",
                 "message": {
@@ -35,6 +42,15 @@ def reminder(request):
         print("POST /api/reminder")
         body = json.loads(request.body.decode("utf-8"))
 
+        print(body)
+
+        distinct_body = []
+        for reminder in body["reminders_notified"]:
+            if reminder not in distinct_body:
+                distinct_body.append(reminder)
+
+        print(body)
+        
         for reminder in body["reminders_notified"]:
             notes = json.loads(reminder["notes"])
             match str(reminder["application_id"]):

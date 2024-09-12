@@ -91,19 +91,18 @@ def handle_function(message: Message):
             case _:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
 
-        try:
-            last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
-            if timezone.now() - last_outgoing_message_time < timedelta(minutes=2) and message.outgoing_text_message == appSettings.last_outgoing_message:
-                print("Message already sent")
-            else:
-                message.send_message()
-                appSettings.update("last_outgoing_message", message.outgoing_text_message)
-        except Exception as e:
-            print(e)
-            message.send_message()
-            appSettings.update("last_outgoing_message", message.outgoing_text_message)
+        # delay = 2
+        # if not appSettings.last_outgoing_message_time:
+        #     new_time = timezone.now() - timedelta(minutes=delay + 1)
+        #     appSettings.update("last_outgoing_message_time", new_time.isoformat())
+        # last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
+        # if timezone.now() - last_outgoing_message_time < timedelta(minutes=delay) and message.outgoing_text_message == appSettings.last_outgoing_message:
+        #     print("Message already sent")
+        # else:
+        #     message.send_message()
+        #     appSettings.update("last_outgoing_message", message.outgoing_text_message)
 
-        appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
+        # appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
         return
 
     elif message.document_type != "google_classroom_api":
