@@ -91,12 +91,18 @@ def handle_function(message: Message):
             case _:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
 
-        last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
-        if timezone.now() - last_outgoing_message_time < timedelta(minutes=2) and message.outgoing_text_message == appSettings.last_outgoing_message:
-            print("Message already sent")
-        else:
+        try:
+            last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
+            if timezone.now() - last_outgoing_message_time < timedelta(minutes=2) and message.outgoing_text_message == appSettings.last_outgoing_message:
+                print("Message already sent")
+            else:
+                message.send_message()
+                appSettings.update("last_outgoing_message", message.outgoing_text_message)
+        except Exception as e:
+            print(e)
             message.send_message()
             appSettings.update("last_outgoing_message", message.outgoing_text_message)
+
         appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
         return
 
