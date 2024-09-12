@@ -50,7 +50,11 @@ def reminder(request):
 
         if len(body["reminders_notified"]) == 1:
             if appSettings.last_reminder_time:
-                last_reminder_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_reminder_time), timezone.get_default_timezone())
+                last_reminder_time = datetime.fromisoformat(appSettings.last_reminder_time)
+
+                # Check if last_reminder_time is naive or aware
+                if timezone.is_naive(last_reminder_time):
+                    last_reminder_time = timezone.make_aware(last_reminder_time, timezone.get_default_timezone())
 
                 if timezone.now() - last_reminder_time < timedelta(minutes=1) and str(body["reminders_notified"][0]["id"]) == appSettings.last_reminder_id:
                     print("Message already sent")
@@ -60,6 +64,8 @@ def reminder(request):
             appSettings.update("last_reminder_time", timezone.now().isoformat())
 
         for reminder in body["reminders_notified"]:
+            # Process each reminder
+
             notes = json.loads(reminder["notes"])
             match str(reminder["application_id"]):
                 case appSettings.reminders_api_classroom_id:
