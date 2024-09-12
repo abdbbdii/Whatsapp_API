@@ -41,16 +41,29 @@ def reminder(request):
     if request.method == "POST":
         print("POST /api/reminder")
         body = json.loads(request.body.decode("utf-8"))
-
-        print(body)
-
         distinct_body = []
         for reminder in body["reminders_notified"]:
             if reminder not in distinct_body:
                 distinct_body.append(reminder)
 
-        print(body)
-        
+        body["reminders_notified"] = distinct_body
+
+        if len(body["reminders_notified"]) == 1:
+            delay = 1
+            if not appSettings.last_reminder_time:
+                last_reminder_time = timezone.now() - timedelta(minutes=delay + 1)
+                appSettings.update("last_reminder_time", last_reminder_time.isoformat())
+            else:
+                last_reminder_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_reminder_time), timezone.get_default_timezone())
+
+            if timezone.now() - last_reminder_time < timedelta(minutes=delay) and str(body["reminders_notified"][0]["id"]) == appSettings.last_reminder_id:
+                print("Message already sent")
+                return JsonResponse({"statusCode": 200, "message": "Message already sent."})
+
+            appSettings.update("last_reminder_id", str(body["reminders_notified"][0]["id"]))
+            appSettings.update("last_reminder_time", timezone.now().isoformat())
+            return
+
         for reminder in body["reminders_notified"]:
             notes = json.loads(reminder["notes"])
             match str(reminder["application_id"]):

@@ -38,8 +38,8 @@ class AppSettings:
         self.reminders_api_remind_id = settings.reminders_api_remind_id
         self.utils_server_url = settings.utils_server_url
         self.utils_server_password = settings.utils_server_password
-        self.last_outgoing_message_time = settings.last_outgoing_message_time
-        self.last_outgoing_message = settings.last_outgoing_message
+        self.last_reminder_id = settings.last_reminder_id
+        self.last_reminder_time = settings.last_reminder_time
 
     def __str__(self) -> str:
         return "\n".join([f"{attr}: {getattr(self, attr)}" for attr in self.list()])
@@ -113,7 +113,7 @@ except ProgrammingError:
             self.reminders_api_remind_id = ""
             self.utils_server_url = ""
             self.utils_server_password = ""
-            self.last_outgoing_message_time = ""
-            self.last_outgoing_message = ""
+            self.last_reminder_id = ""
+            self.last_reminder_time = ""
 
     appSettings = AppSettings()

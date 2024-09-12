@@ -24,8 +24,8 @@ class Settings(models.Model):
     reminders_api_remind_id = models.TextField(default=None, null=True)
     utils_server_url = models.TextField(default=None, null=True)
     utils_server_password = models.TextField(default=None, null=True)
-    last_outgoing_message_time = models.DateTimeField(auto_now_add=True, null=True)
-    last_outgoing_message = models.TextField(default=None, null=True)
+    last_reminder_id = models.TextField(default=None, null=True)
+    last_reminder_time = models.TextField(default=None, null=True)
 
 
 class Kharchey(models.Model):

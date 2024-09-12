@@ -142,7 +142,7 @@ class ReminderAPI:
 
 
 if __name__ == "__main__":
-    reminder_api = ReminderAPI("jVgTHzQthB7V1WNZKlFwMeykVbGAfEB6tfI7Qgoy", "https://whatsapp-api-backend.vercel.app/", ("your_username", "your_password"))
+    reminder_api = ReminderAPI("", "https://whatsapp-api-backend.vercel.app/", ("your_username", "your_password"))
     # print(reminder_api.create_application("classroom", "10:00").text)  # 873
 
     # print(reminder_api.create_application("Whatsapp_API_cronjob", "10:00").text)  # 874
