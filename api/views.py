@@ -51,8 +51,8 @@ def reminder(request):
         if len(body["reminders_notified"]) == 1:
             delay = 1
             if not appSettings.last_reminder_time:
-                last_reminder_time = timezone.now() - timedelta(minutes=delay + 1)
-                appSettings.update("last_reminder_time", last_reminder_time.isoformat())
+                last_reminder_time = (timezone.now() - timedelta(minutes=delay + 1)).isoformat()
+                appSettings.update("last_reminder_time", last_reminder_time)
             else:
                 last_reminder_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_reminder_time), timezone.get_default_timezone())
 
