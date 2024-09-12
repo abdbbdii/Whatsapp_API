@@ -49,10 +49,10 @@ def reminder(request):
         body["reminders_notified"] = distinct_body
 
         if len(body["reminders_notified"]) == 1:
+            print(appSettings.last_reminder_time, bool(appSettings.last_reminder_time))
             if appSettings.last_reminder_time:
                 last_reminder_time = datetime.fromisoformat(appSettings.last_reminder_time)
 
-                # Check if last_reminder_time is naive or aware
                 if timezone.is_naive(last_reminder_time):
                     last_reminder_time = timezone.make_aware(last_reminder_time, timezone.get_default_timezone())
 
@@ -64,8 +64,6 @@ def reminder(request):
             appSettings.update("last_reminder_time", timezone.now().isoformat())
 
         for reminder in body["reminders_notified"]:
-            # Process each reminder
-
             notes = json.loads(reminder["notes"])
             match str(reminder["application_id"]):
                 case appSettings.reminders_api_classroom_id:
