@@ -49,13 +49,10 @@ def reminder(request):
         body["reminders_notified"] = distinct_body
 
         if len(body["reminders_notified"]) == 1:
-            print(appSettings.last_reminder_time, bool(appSettings.last_reminder_time))
             if appSettings.last_reminder_time:
                 last_reminder_time = datetime.fromisoformat(appSettings.last_reminder_time)
-
                 if timezone.is_naive(last_reminder_time):
                     last_reminder_time = timezone.make_aware(last_reminder_time, timezone.get_default_timezone())
-
                 if timezone.now() - last_reminder_time < timedelta(minutes=1) and str(body["reminders_notified"][0]["id"]) == appSettings.last_reminder_id:
                     print("Message already sent")
                     return JsonResponse({"statusCode": 200, "message": "Message already sent."})
