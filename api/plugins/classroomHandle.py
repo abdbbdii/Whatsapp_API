@@ -99,7 +99,7 @@ def handle_function(message: Message):
         # if timezone.now() - last_outgoing_message_time < timedelta(minutes=delay) and message.outgoing_text_message == appSettings.last_outgoing_message:
         #     print("Message already sent")
         # else:
-        #     message.send_message()
+        message.send_message()
         #     appSettings.update("last_outgoing_message", message.outgoing_text_message)
 
         # appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
