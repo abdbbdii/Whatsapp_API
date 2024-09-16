@@ -91,26 +91,17 @@ def handle_function(message: Message):
             case _:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
 
-        # delay = 2
-        # if not appSettings.last_outgoing_message_time:
-        #     new_time = timezone.now() - timedelta(minutes=delay + 1)
-        #     appSettings.update("last_outgoing_message_time", new_time.isoformat())
-        # last_outgoing_message_time = timezone.make_aware(datetime.fromisoformat(appSettings.last_outgoing_message_time), timezone.get_default_timezone())
-        # if timezone.now() - last_outgoing_message_time < timedelta(minutes=delay) and message.outgoing_text_message == appSettings.last_outgoing_message:
-        #     print("Message already sent")
-        # else:
         message.send_message()
-        #     appSettings.update("last_outgoing_message", message.outgoing_text_message)
-
-        # appSettings.update("last_outgoing_message_time", timezone.now().isoformat())
         return
 
     elif message.document_type != "google_classroom_api":
         return
 
+    status = "New" if message.document["is_new"] else "Updated"
+
     if message.document["type"] == "courseWorkMaterial":
         message.outgoing_text_message = make_message(
-            header=f'New Material for {message.document["course"]["descriptionHeading"]}',
+            header=f'{status} Material for {message.document["course"]["descriptionHeading"]}',
             items={
                 "📝 Title": message.document["activity"]["title"],
                 "📄 Description": message.document["activity"].get("description"),
@@ -133,7 +124,7 @@ def handle_function(message: Message):
             due = f'{"/".join(list(map(str, message.document["activity"]["dueDate"].values())))} {time}'
 
         message.outgoing_text_message = make_message(
-            header=f'New {message.document["activity"]["workType"].title()} created for {message.document["course"]["descriptionHeading"]}',
+            header=f'New {message.document["activity"]["workType"].title()} for {message.document["course"]["descriptionHeading"]}',
             items={
                 "📝 Title": message.document["activity"]["title"],
                 "📄 Description": message.document["activity"].get("description"),
@@ -146,7 +137,7 @@ def handle_function(message: Message):
 
     elif message.document["type"] == "announcements":
         message.outgoing_text_message = make_message(
-            header=f'New Announcement for {message.document["course"]["descriptionHeading"]}',
+            header=f'{status} Announcement for {message.document["course"]["descriptionHeading"]}',
             items={
                 "💬 Text": message.document["activity"]["text"],
                 "🔗 Link": message.document["activity"]["alternateLink"],
