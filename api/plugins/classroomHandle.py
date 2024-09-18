@@ -89,7 +89,7 @@ def handle_function(message: Message):
             case 10:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*\n\nYou should start submitting your work now.\n{notes["link"]}'
             case 1440:
-                message.outgoing_text_message = f'*🔔 Only 1 day left for {message.document["title"]} 🔔*'
+                message.outgoing_text_message = f'*🔔 Only 24 hours left for {message.document["title"]} 🔔*'
             case _:
                 message.outgoing_text_message = f'*🔔 Only {notes["time_remaining"]} minutes left for {message.document["title"]} 🔔*'
 
