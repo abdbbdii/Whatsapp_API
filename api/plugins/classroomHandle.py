@@ -53,7 +53,7 @@ def set_reminder(date: dict, time: dict, title: str, link: str):
             application_id = reminders_api.create_application(appSettings.reminders_api_classroom_name, "10:00").json().get("id")
         appSettings.update("reminders_api_classroom_id", application_id)
 
-    time_intervals = [60, 30, 10, 0]
+    time_intervals = [60, 10, 0]
     for time_interval in time_intervals:
         date_tz, time_tz = subtract_minutes(date, time, time_interval)
         response = reminders_api.create_reminder(
