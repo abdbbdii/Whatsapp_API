@@ -94,7 +94,7 @@ class AppSettings:
 try:
     appSettings = AppSettings()
 
-except ProgrammingError:
+except:
 
     class AppSettings:
         def __init__(self) -> None:
